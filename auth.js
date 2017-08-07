@@ -28,21 +28,27 @@ var bodyParser = require('body-parser');
 module.exports = function(app) {
   // Need JSON body parser for most API responses
   app.use(bodyParser.json());
+
   // Set up cookies and sessions to save tokens
   app.use(cookieParser());
+
   app.use(session(
     { secret: '81b8b800-31ad-480b-9dcf-bc93a7debf08',
       resave: false,
       saveUninitialized: false 
   }));
+
   app.use(bodyParser.json())
+
   app.use(function(req, res, next) {
       res.set('Access-Control-Allow-Origin', '*')
       res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
       res.set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
       next();
   })
+
   app.set('authenticate', authenticate)
+
   app.get('/', function(req, res) {
     res.redirect('/authorize')
   })
@@ -65,22 +71,45 @@ module.exports = function(app) {
     }
   })
 
-  app.get('/logincomplete', function(req, res) {
-    var access_token = req.session.access_token
-    var refresh_token = req.session.refresh_token
-    var user_info = req.session.user_info
-    if (access_token === undefined || refresh_token === undefined) {
-      res.redirect('/authorize')
-    }
+  app.get('/getTokenData', function(req, res) {
+    var authCode = req.body.code
+    if (authCode) {
+      getTokenFromCode(authCode, function(err, token) {
+        if (err) {
+          res.status(401).send({message: "Auth failed."})
+        }
+        else {
+          tokenReceived(req, res, token)
+          var data = {
+            access_token: req.session.access_token,
+            refresh_token: req.session.refresh_token,
+            user_info: req.session.user_info
+          }
+          res.status(200).send(data)
+        }
+      })
+    } 
     else {
-      var data = {
-        access_token: access_token,
-        refresh_token: refresh_token,
-        user_info: user_info
-      }
-      res.status(200).send(data)
+      res.status(400).send()
     }
   })
+
+  // app.get('/logincomplete', function(req, res) {
+  //   var access_token = req.session.access_token
+  //   var refresh_token = req.session.refresh_token
+  //   var user_info = req.session.user_info
+  //   if (access_token === undefined || refresh_token === undefined) {
+  //     res.redirect('/authorize')
+  //   }
+  //   else {
+  //     var data = {
+  //       access_token: access_token,
+  //       refresh_token: refresh_token,
+  //       user_info: user_info
+  //     }
+  //     res.status(200).send(data)
+  //   }
+  // })
 }
 
 function authenticate(req, res, next) {
