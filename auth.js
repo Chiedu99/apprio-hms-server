@@ -72,7 +72,8 @@ module.exports = function(app) {
   })
 
   app.get('/getTokenData', function(req, res) {
-    var authCode = req.body.code
+    var authCode = req.query.code
+    console.log(authCode)
     if (authCode) {
       getTokenFromCode(authCode, function(err, token) {
         if (err) {
@@ -85,6 +86,7 @@ module.exports = function(app) {
             refresh_token: req.session.refresh_token,
             user_info: req.session.user_info
           }
+          console.log(data)
           res.status(200).send(data)
         }
       })
