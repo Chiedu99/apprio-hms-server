@@ -60,19 +60,21 @@ var Server = function() {
     }
 }
 
-db.testConnection(function(err) {
-    server = new Server()
-    console.log("%s", Date(Date.now()))
-    console.log("Attempting to connect to database...")
-    if (err) {
-        console.log('DB ERROR:'.red, "Unable to connect to database. Server will have limited functionality.")
-        console.log(err)
-        server.initializeServer()
-    }
-    else {
-        console.log("Database connection established.")
-        server.initializeServer()
-    }
-})
+server = new Server()
+server.initializeServer()
+// db.testConnection(function(err) {
+//     server = new Server()
+//     console.log("%s", Date(Date.now()))
+//     console.log("Attempting to connect to database...")
+//     if (err) {
+//         console.log('DB ERROR:'.red, "Unable to connect to database. Server will have limited functionality.")
+//         console.log(err)
+//         server.initializeServer()
+//     }
+//     else {
+//         console.log("Database connection established.")
+//         server.initializeServer()
+//     }
+// })
 
 // // Only start server if database can be reached
