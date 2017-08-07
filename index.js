@@ -59,6 +59,7 @@ var Server = function() {
         })
     }
 }
+server = new Server()
 server.initializeServer()
 // // Only start server if database can be reached
 // db.testConnection(function(err) {
