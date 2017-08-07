@@ -21,12 +21,7 @@ var Server = function() {
 	var self = this
 
 	self.setupVariables = function () {
-		self.ip_address = process.env.OPENSHIFT_NODEJS_IP
-		self.port = config.server.port
-		if (typeof self.ip_address === "undefined") {
-			console.warn('No OPENSHIFT_NODEJS_IP variable. Using IP address 127.0.0.1 instead.')
-			self.ip_address = "127.0.0.1"
-		}
+		self.port = process.env.PORT || 8000
 	}
 
 	// Initialize App
@@ -62,7 +57,6 @@ var Server = function() {
             res.set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
             next();
         })
-        console.log(4242)
     }
 }
 
