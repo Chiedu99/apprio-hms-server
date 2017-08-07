@@ -1,6 +1,6 @@
 var clientID = '976007e5-874f-4d68-a2dd-04065b0bade3';
 var clientSecret = 'CRove2sVeFmFNFuoPFYtLS2';
-var redirectUri = 'http://localhost:8000/authorize';
+var redirectUri = 'https://apprio-pi-server-heroku.herokuapp.com/authorize';
 
 var scopes = [
   'openid',
