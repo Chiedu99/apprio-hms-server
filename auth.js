@@ -171,7 +171,7 @@ function retrievePublicKey(kid, completion) {
   var options = {
     host: config.publicKeyURL,
   };
-  http.get(options, function(res) {
+  http.get(config.publicKeyURL, function(res) {
     res.on('data', function(data) {
       var keys = data.keys
       for (i = 0; i < keys.length; i++) {
