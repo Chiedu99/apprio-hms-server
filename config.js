@@ -10,5 +10,5 @@ module.exports = {
 		user: 'master',
 		password: '.U%pqQ$rgfKvlp/'
 	},
-	publicKeyURL: "https://login.microsoftonline.com/common/discovery/keys"
+	publicKeyURL: "http://login.microsoftonline.com/common/discovery/keys"
 }
