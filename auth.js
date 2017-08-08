@@ -141,7 +141,7 @@ module.exports = function(app) {
             res.status(401).send({message: "Token invalid."})
           }
         }
-        if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+        else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
           console.log("User authenticated. Continue routing...")
           next()
         }
