@@ -168,14 +168,14 @@ module.exports = function(app) {
 }
 
 function retrievePublicKey(kid, completion) {
-  var options = {
-    host: config.publicKeyURL,
-  };
   http.get(config.publicKeyURL, function(res) {
     res.on('data', function(data) {
+      console.log(data)
       var keys = data.keys
+      console.log(keys)
       for (i = 0; i < keys.length; i++) {
         var key = keys[i]
+        console.log(key)
         if (key.kid == kid) {
           console.log(key.x5c)
           completion(key.x5c)
