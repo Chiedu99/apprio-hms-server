@@ -115,13 +115,13 @@ module.exports = function(app) {
   function authenticate(req, res, next) {
     var access_token = req.session.access_token
     var refresh_token = req.session.refresh_token
-    console.log("****TOKENS****\n", access_token, refresh_token)
     var secret = app.get("secret")
     if (access_token === undefined || refresh_token === undefined) {
       res.status(401).send({message: "No token given."})
     }
     else {
       jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
+        console.log("***DECODED JWT*** ", decoded)
         if (err) {
           console.log(err)
           if (err.name === "TokenExpiredError") {
@@ -138,7 +138,7 @@ module.exports = function(app) {
             })
           }
           else {
-            console.log
+            console.log(err)
             res.status(401).send({message: "Token invalid."})
           }
         }
