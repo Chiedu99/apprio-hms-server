@@ -93,6 +93,7 @@ module.exports = function(app) {
         }
         else {
           tokenReceived(req, res, token)
+          console.log(token)
           var data = {
             access_token: req.session.access_token,
             refresh_token: req.session.refresh_token,
