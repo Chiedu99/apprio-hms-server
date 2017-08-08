@@ -120,7 +120,7 @@ module.exports = function(app) {
       res.status(401).send({message: "No token given."})
     }
     else {
-      jwt.verify(access_token, secret, function(err, decoded) {
+      jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
         if (err) {
           console.log(err)
           if (err.name === "TokenExpiredError") {
