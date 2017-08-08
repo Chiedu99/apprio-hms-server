@@ -28,6 +28,7 @@ var colors = require('colors')
 var jwt = require('jsonwebtoken');
 var request = require('request')
 var config = require('./config.js')
+var jwkToPem = require('jwk-to-pem'),
 
 
 module.exports = function(app) {
@@ -125,9 +126,10 @@ module.exports = function(app) {
     else {
       var decoded = jwt.decode(access_token, {complete: true})
       var kid = decoded.header.kid
-      retrievePublicKey(kid, function(secret) {
-        if (secret) {
-          jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
+      retrievePublicKey(kid, function(jwk) {
+        if (jwk) {
+          pem = jwkToPem(jwk);
+          jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
             if (err) {
               console.log(err)
               if (err.name === "TokenExpiredError") {

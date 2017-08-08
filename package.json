@@ -21,6 +21,7 @@
     "express": "^4.15.3",
     "express-session": "^1.15.5",
     "jsonwebtoken": "^7.4.2",
+    "jwk-to-pem": "^1.2.6",
     "moment": "^2.18.1",
     "node-outlook": "^1.1.6",
     "nodemon": "^1.11.0",
