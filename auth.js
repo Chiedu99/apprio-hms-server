@@ -26,7 +26,7 @@ var session = require('express-session')
 var bodyParser = require('body-parser')
 var colors = require('colors')
 var jwt = require('jsonwebtoken');
-var http = require('http');
+var request = require('request')
 var config = require('./config.js')
 
 
@@ -168,26 +168,22 @@ module.exports = function(app) {
 }
 
 function retrievePublicKey(kid, completion) {
-  http.get(config.publicKeyURL, function(res) {
-    res.on('data', function(data) {
-      console.log(data)
-      var keys = data.keys
-      console.log(keys)
-      for (i = 0; i < keys.length; i++) {
-        var key = keys[i]
-        console.log(key)
-        if (key.kid == kid) {
-          console.log(key.x5c)
-          completion(key.x5c)
-        }
+  var options = {
+    url: config.publicKeyURL,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+  request(options, function (err, res, body) {
+    var info = JSON.parse(body)
+    var keys = info["keys"]
+    for (i=0; i < keys.length; i++) {
+      var key = keys[i]
+      if (key.kid == kid) {
+        console.log(key.x5c)
       }
-      console.log("No kid with value specified.")
-      completion(null)
-    })
-  }).on("error", function(err){
-      console.log(err)
-      completion(null)
-    });
+    }
+  })
 }
 
 function refreshToken(refresh_token, completion) {
