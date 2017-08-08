@@ -12,14 +12,14 @@ var options = {
 
 var pgp = require('pg-promise')(options)
 var cn = {
-			host: config.db.host,
-			port: config.db.port,
-			database: config.db.database,
-			user: config.db.user,
-			password: config.db.password
+			host: 'ec2-54-235-168-152.compute-1.amazonaws.com',
+			port: 5432,
+			database: 'd6kcqlbbrac5bn',
+			user: 'mxtnxulynacpcj',
+			password: 'f341e82d34b37bd59dc6b92ce133863eafa9caa80c5eccfbe06cedde1b1a59f0'
 			}
 
-var db = pgp(cn); 
+var db = pgp('postgres://mxtnxulynacpcj:f341e82d34b37bd59dc6b92ce133863eafa9caa80c5eccfbe06cedde1b1a59f0@ec2-54-235-168-152.compute-1.amazonaws.com:5432/d6kcqlbbrac5bn?ssl=true'); 
 
 var testConnection = function(completion) {
 	db.connect()
