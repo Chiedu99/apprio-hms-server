@@ -181,6 +181,7 @@ function retrievePublicKey(kid, completion) {
       var key = keys[i]
       if (key.kid == kid) {
         console.log(key.x5c)
+        completion(key.x5c)
       }
     }
   })
