@@ -28,7 +28,7 @@ var colors = require('colors')
 var jwt = require('jsonwebtoken');
 var request = require('request')
 var config = require('./config.js')
-var jwkToPem = require('jwk-to-pem'),
+var jwkToPem = require('jwk-to-pem')
 
 
 module.exports = function(app) {
@@ -165,7 +165,6 @@ module.exports = function(app) {
       })
     }
   }
-    
 }
 
 function retrievePublicKey(kid, completion) {
@@ -179,12 +178,12 @@ function retrievePublicKey(kid, completion) {
     var info = JSON.parse(body)
     var keys = info["keys"]
     for (i=0; i < keys.length; i++) {
-      var key = keys[i]
-      if (key.kid == kid) {
-        console.log(key)
-        completion(key)
+      var jwk = keys[i]
+      if (jwk.kid == kid) {
+        completion(jwk)
       }
     }
+    completion(null)
   })
 }
 
