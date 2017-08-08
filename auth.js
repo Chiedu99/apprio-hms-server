@@ -128,7 +128,6 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(secret) {
         if (secret) {
           jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
-            console.log("***DECODED JWT*** ", decoded)
             if (err) {
               console.log(err)
               if (err.name === "TokenExpiredError") {
@@ -181,7 +180,7 @@ function retrievePublicKey(kid, completion) {
       var key = keys[i]
       if (key.kid == kid) {
         console.log(key.x5c)
-        completion(key.x5c)
+        completion(key.x5c[0])
       }
     }
   })
