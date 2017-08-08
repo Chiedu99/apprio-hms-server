@@ -120,8 +120,9 @@ module.exports = function(app) {
       res.status(401).send({message: "No token given."})
     }
     else {
-      var decoded = jwt.decode(access_token)
+      var decoded = jwt.decode(access_token, {complete: true})
       console.log(decoded)
+      console.log(decoded.kid)
       // jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
       //   console.log("***DECODED JWT*** ", decoded)
       //   if (err) {
