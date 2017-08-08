@@ -115,7 +115,7 @@ module.exports = function(app) {
   function authenticate(req, res, next) {
     var access_token = req.session.access_token
     var refresh_token = req.session.refresh_token
-    console.log(req.session)
+    console.log("****TOKENS****\n", access_token, refresh_token)
     var secret = app.get("secret")
     if (access_token === undefined || refresh_token === undefined) {
       res.status(401).send({message: "No token given."})
