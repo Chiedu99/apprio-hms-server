@@ -28,8 +28,7 @@ var Server = function() {
 	self.initializeServer = function() {
 		console.log("Initializing server...")
         self.app = express()
-		// self.app.use("key", config.key)
-		// self.app.use("authenticate", self.authenticate)
+        self.app.set("secret", config.server.secret)
 		self.createRoutes()
         self.setupVariables()
         self.start()

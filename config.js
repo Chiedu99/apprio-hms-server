@@ -1,7 +1,5 @@
-var key = "BlueberryCanan42"
-
 module.exports = {
-	key: key,
+	secret: "BlueberryCanan42",
 	server: {
 		port: 8000
 	},

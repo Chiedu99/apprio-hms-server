@@ -1,6 +1,6 @@
 var clientID = '976007e5-874f-4d68-a2dd-04065b0bade3';
 var clientSecret = 'CRove2sVeFmFNFuoPFYtLS2';
-var redirectUri = 'https://apprio-pi-server-heroku.herokuapp.com/authorize';
+var redirectUri = 'https://www.getpostman.com/oauth2/callback'//'https://apprio-pi-server-heroku.herokuapp.com/authorize';
 
 var scopes = [
   'openid',
@@ -20,10 +20,12 @@ const credentials = {
   }
 };
 
-var oauth2 = require('simple-oauth2').create(credentials);
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var bodyParser = require('body-parser');
+var oauth2 = require('simple-oauth2').create(credentials)
+var cookieParser = require('cookie-parser')
+var session = require('express-session')
+var bodyParser = require('body-parser')
+var colors = require('colors')
+var jwt = require('jsonwebtoken');
 
 module.exports = function(app) {
   // Need JSON body parser for most API responses
@@ -54,30 +56,36 @@ module.exports = function(app) {
   })
 
   app.get('/authorize', function(req, res) {
+    console.log((req.url).blue)
     var authCode = req.query.code
     if (authCode) {
       getTokenFromCode(authCode, function(err, token) {
         if (err) {
-          res.status(401).send({message: "AUTHORIZATION FAILED: Attempted to access an unauthorized resource."})
+          console.log(err)
+          res.status(401).send({message: err})
         }
         else {
           tokenReceived(req, res, token)
+          console.log(req.session)
           res.status(200).send({success: true})
         }
       })
     }
     else {
-      res.send({url: getAuthUrl()})
+      var url = getAuthUrl()
+      console.log(url)
+      res.send({url: url})
     }
   })
 
   app.get('/getTokenData', function(req, res) {
+    console.log((req.url).blue)
     var authCode = req.query.code
-    console.log(authCode)
     if (authCode) {
       getTokenFromCode(authCode, function(err, token) {
         if (err) {
-          res.status(401).send({message: "Auth failed."})
+          console.log(err)
+          res.status(401).send({message: err})
         }
         else {
           tokenReceived(req, res, token)
@@ -92,51 +100,71 @@ module.exports = function(app) {
       })
     } 
     else {
+      console.log("No auth token given.")
       res.status(400).send()
     }
   })
 
-  // app.get('/logincomplete', function(req, res) {
-  //   var access_token = req.session.access_token
-  //   var refresh_token = req.session.refresh_token
-  //   var user_info = req.session.user_info
-  //   if (access_token === undefined || refresh_token === undefined) {
-  //     res.redirect('/authorize')
-  //   }
-  //   else {
-  //     var data = {
-  //       access_token: access_token,
-  //       refresh_token: refresh_token,
-  //       user_info: user_info
-  //     }
-  //     res.status(200).send(data)
-  //   }
-  // })
-}
+  app.get('/logout', function(req, res) {
+    console.log((req.url).blue)
+    req.session.destroy()
+    console.log("Logged out.")
+    res.status(201).send()
+  })
 
-function authenticate(req, res, next) {
-  var access_token = req.session.access_token
-  var refresh_token = req.session.refresh_token
-  var authCode = req.query.code
-  if (access_token === undefined || refresh_token === undefined) {
-    if (authCode) {
-      getTokenFromCode(authCode, function(err, token) {
-          if (err) {
-            res.status(403).send({message: "Could not authenticate with given token."})
+  function authenticate(req, res, next) {
+    var access_token = req.session.access_token
+    var refresh_token = req.session.refresh_token
+    var secret = app.get("secret")
+    if (access_token === undefined || refresh_token === undefined) {
+      res.status(401).send({message: "No token given."})
+    }
+    else {
+      jwt.verify(access_token, secret, function(err, decoded) {
+        if (err) {
+          console.log(err)
+          if (err.name === "TokenExpiredError") {
+            refreshToken(refresh_token, function(err, token) {
+              if (err) {
+                console.log(err)
+                res.status(401).send({message: "Token expired. Couldn't refresh."})
+              }
+              else {
+                console.log("Token refreshed.")
+                tokenReceived(req, res, token)
+                next()
+              }
+            })
           }
           else {
-            tokenReceived(req, res, token)
-            next()
+            console.log
+            res.status(401).send({message: "Token invalid."})
           }
-        })
-      }
-    else {
-      res.status(401).send({message: "No authentication code given."})
+        }
+        if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+          console.log("User authenticated. Continue routing...")
+          next()
+        }
+        else {
+          res.status(403).send({message: "Couldn't decode token. Token invalid."})
+        }
+      }) 
     }
   }
+    
+}
+
+
+
+function refreshToken(refresh_token, completion) {
+  if (refresh_token === undefined) {
+    var err = "No refresh token in session."
+    completion(err, null)
+  }
   else {
-    console.log("it worked!!!!")
-    next()
+    getTokenFromRefreshToken(refresh_token, function(err, token) {
+      completion(err, token)
+    })
   }
 }
 
@@ -157,13 +185,10 @@ function getTokenFromCode(authCode, completion) {
     }, 
     function (error, result) {
         if (error) {
-          console.log('Access token error: ', error.message);
           completion(error, null);
         }
         else {
           var token = oauth2.accessToken.create(result);
-          console.log('');
-          console.log('Token created: ', token.token);
           completion(null, token);
         }
     });
@@ -192,4 +217,17 @@ function getInfoFromIDToken(id_token) {
       email: jwt.preferred_username,
   }
   return userInfo
+}
+
+
+function getTokenFromRefreshToken(refresh_token, completion) {
+  var token = oauth2.accessToken.create({ refresh_token: refresh_token, expires_in: 0});
+  token.refresh(function(err, result) {
+    if (err) {
+      completion(err, null)
+    }
+    else {
+      completion(null, result)
+    }
+  })
 }

@@ -9,10 +9,11 @@ var bodyParser = require('body-parser')
 var colors = require('colors')
 
 module.exports = function(app) {
+	var authenticate = app.get("authenticate")
 	app.use(bodyParser.json())
-	app.get("/hubs/health", checkHealth)
-    app.put("/hubs/rebootpi", reboot)
-    app.put("/hubs/shutdowpi", shutdown)
+	app.get("/hubs/health", authenticate, checkHealth)
+    app.put("/hubs/rebootpi", authenticate, reboot)
+    app.put("/hubs/shutdowpi", authenticate, shutdown)
 }
 
 // Retrieve pi system information and return json of information.
