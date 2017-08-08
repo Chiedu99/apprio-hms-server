@@ -120,36 +120,41 @@ module.exports = function(app) {
       res.status(401).send({message: "No token given."})
     }
     else {
-      jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
-        console.log("***DECODED JWT*** ", decoded)
-        if (err) {
-          console.log(err)
-          if (err.name === "TokenExpiredError") {
-            refreshToken(refresh_token, function(err, token) {
-              if (err) {
-                console.log(err)
-                res.status(401).send({message: "Token expired. Couldn't refresh."})
-              }
-              else {
-                console.log("Token refreshed.")
-                tokenReceived(req, res, token)
-                next()
-              }
-            })
-          }
-          else {
-            console.log(err)
-            res.status(401).send({message: "Token invalid."})
-          }
-        }
-        else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-          console.log("User authenticated. Continue routing...")
-          next()
-        }
-        else {
-          res.status(403).send({message: "Couldn't decode token. Token invalid."})
-        }
-      }) 
+      jwt.decode(access_token, { algorithms: ['RS256'] }, function(err, decoded) {
+        console.log(decoded)
+        console.log(err)
+      })
+      // jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
+      //   console.log("***DECODED JWT*** ", decoded)
+      //   if (err) {
+      //     console.log(err)
+      //     if (err.name === "TokenExpiredError") {
+      //       refreshToken(refresh_token, function(err, token) {
+      //         if (err) {
+      //           console.log(err)
+      //           res.status(401).send({message: "Token expired. Couldn't refresh."})
+      //         }
+      //         else {
+      //           console.log("Token refreshed.")
+      //           tokenReceived(req, res, token)
+      //           next()
+      //         }
+      //       })
+      //     }
+      //     else {
+      //       console.log(err)
+      //       res.status(401).send({message: "Token invalid."})
+      //     }
+      //   }
+      //   else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+      //     console.log("User authenticated. Continue routing...")
+      //     next()
+      //   }
+      //   else {
+      //     res.status(403).send({message: "Couldn't decode token. Token invalid."})
+      //   }
+      // }) 
+      res.status(200).send()
     }
   }
     
