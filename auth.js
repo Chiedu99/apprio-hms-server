@@ -26,6 +26,9 @@ var session = require('express-session')
 var bodyParser = require('body-parser')
 var colors = require('colors')
 var jwt = require('jsonwebtoken');
+var http = require('http');
+var config = require('./config.js')
+
 
 module.exports = function(app) {
   // Need JSON body parser for most API responses
@@ -121,45 +124,71 @@ module.exports = function(app) {
     }
     else {
       var decoded = jwt.decode(access_token, {complete: true})
-      console.log(decoded)
-      console.log(decoded.kid)
-      // jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
-      //   console.log("***DECODED JWT*** ", decoded)
-      //   if (err) {
-      //     console.log(err)
-      //     if (err.name === "TokenExpiredError") {
-      //       refreshToken(refresh_token, function(err, token) {
-      //         if (err) {
-      //           console.log(err)
-      //           res.status(401).send({message: "Token expired. Couldn't refresh."})
-      //         }
-      //         else {
-      //           console.log("Token refreshed.")
-      //           tokenReceived(req, res, token)
-      //           next()
-      //         }
-      //       })
-      //     }
-      //     else {
-      //       console.log(err)
-      //       res.status(401).send({message: "Token invalid."})
-      //     }
-      //   }
-      //   else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-      //     console.log("User authenticated. Continue routing...")
-      //     next()
-      //   }
-      //   else {
-      //     res.status(403).send({message: "Couldn't decode token. Token invalid."})
-      //   }
-      // }) 
-      res.status(200).send()
+      var kid = decoded.header.kid
+      retrievePublicKey(kid, function(secret) {
+        if (secret) {
+          jwt.verify(access_token, secret, { algorithms: ['RS256'] }, function(err, decoded) {
+            console.log("***DECODED JWT*** ", decoded)
+            if (err) {
+              console.log(err)
+              if (err.name === "TokenExpiredError") {
+                refreshToken(refresh_token, function(err, token) {
+                  if (err) {
+                    console.log(err)
+                    res.status(401).send({message: "Token expired. Couldn't refresh."})
+                  }
+                  else {
+                    console.log("Token refreshed.")
+                    tokenReceived(req, res, token)
+                    next()
+                  }
+                })
+              }
+              else {
+                console.log(err)
+                res.status(401).send({message: "Token invalid."})
+              }
+            }
+            else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+              console.log("User authenticated. Continue routing...")
+              next()
+            }
+            else {
+              res.status(403).send({message: "Couldn't decode token. Token invalid."})
+            }
+          }) 
+        }
+        else {
+          res.status(401).send()
+        }
+      })
     }
   }
     
 }
 
-
+function retrievePublicKey(kid, completion) {
+  var options = {
+    host: config.publicKeyURL,
+  };
+  http.get(options, function(res) {
+    res.on('data', function(data) {
+      var keys = data.keys
+      for (i = 0; i < keys.length; i++) {
+        var key = keys[i]
+        if (key.kid == kid) {
+          console.log(key.x5c)
+          completion(key.x5c)
+        }
+      }
+      console.log("No kid with value specified.")
+      completion(null)
+    })
+  }).on("error", function(err){
+      console.log(err)
+      completion(null)
+    });
+}
 
 function refreshToken(refresh_token, completion) {
   if (refresh_token === undefined) {

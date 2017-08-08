@@ -9,5 +9,6 @@ module.exports = {
 		database: 'apprio_pi_hub',
 		user: 'master',
 		password: '.U%pqQ$rgfKvlp/'
-	}
+	},
+	publicKeyURL: "https://login.microsoftonline.com/common/discovery/keys"
 }
