@@ -132,6 +132,7 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
           pem = jwkToPem(jwk);
+          console.log(req.headers)
           const checkJwt = jwt({
             // Dynamically provide a signing key
             // based on the kid in the header and 
