@@ -73,6 +73,7 @@ module.exports = function(app) {
         }
         else {
           tokenReceived(req, res, token)
+          console.log(token)
           res.status(200).send({success: true})
         }
       })
