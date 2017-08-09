@@ -73,38 +73,38 @@ var createHub = function(req, res) {
 	var city = req.body.city
 	var state = req.body.state
 	var url = req.body.url
-	db.createHub(name, city, state, function(err, data) {
-		// If there's an error, don't respond with the new hub json.
-		// If there's no error, return new hub json.
-		switch (err) {
-			case null:
-				if (data === null) {
-					res.status(500).send()
-					console.log("Database didn't return an object.")
-				}
-				else {
-					// Send new hub values to database.
-					cmd = "health"
-					let id = data.id
-					let args =  [piDaemonPath, cmd]
-					runDaemon(args, function(err, response, stderr) {
-						if (err !== null) {
+	cmd = "health"
+	let args =  [piDaemonPath, cmd]
+	runDaemon(args, function(err, response, stderr) {
+		if (err !== null) {
+			res.status(500).send()
+			console.log(err)
+		}
+		else if (response === null) {
+			res.status(500).send()
+			console.log("No response received from script.")
+		}
+		else {
+			// Update database if health is retrieved successfully.
+			var responseJSON = JSON.parse(response)
+			ip_address = responseJSON.ip_address
+			system = responseJSON.system
+			version = responseJSON.version
+			release = responseJSON.release
+			hostname = responseJSON.hostname
+			temperature = responseJSON.temperature
+			db.createHub(name, city, state, function(err, data) {
+				// If there's an error, don't respond with the new hub json.
+				// If there's no error, return new hub json.
+				switch (err) {
+					case null:
+						if (data === null) {
 							res.status(500).send()
-							console.log(err)
-						}
-						else if (response === null) {
-							res.status(500).send()
-							console.log("No response received from script.")
+							console.log("Database didn't return an object.")
 						}
 						else {
-							// Update database if health is retrieved successfully.
-							var responseJSON = JSON.parse(response)
-							ip_address = responseJSON.ip_address
-							system = responseJSON.system
-							version = responseJSON.version
-							release = responseJSON.release
-							hostname = responseJSON.hostname
-							temperature = responseJSON.temperature
+							// Send new hub values to database.
+							let id = data.id
 							db.createPi(id, ip_address, system, version, release, url, hostname, temperature, function(err, data) {
 								switch (err) {
 									case null:
@@ -124,12 +124,12 @@ var createHub = function(req, res) {
 								}
 							})
 						}
-					})
+						break
+					default:
+						res.status(409).send()
+						console.log(err)
 				}
-				break
-			default:
-				res.status(409).send()
-				console.log(err)
+			})
 		}
 	})
 }
