@@ -174,7 +174,7 @@ module.exports = function(app) {
                 res.status(403).send({message: "Couldn't decode token. Token invalid."})
               }
             }) 
-          }
+          })
             // var opts = {
             //   secret: signingKey,
             //   algorithms: ['RS256']
@@ -185,7 +185,6 @@ module.exports = function(app) {
             // console.log("")
           
             // Now I can use this to configure my Express or Hapi middleware 
-          });
           // var secret = jwksRsa.expressJwtSecret({
           //     cache: true,
           //     rateLimit: true,
