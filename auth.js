@@ -121,6 +121,7 @@ module.exports = function(app) {
 
   function authenticate(req, res, next) {
     console.log("Authenticating...")
+    console.log(id_token, refresh_token)
     var id_token = req.session.id_token
     var refresh_token = req.session.refresh_token
     if (id_token === undefined || refresh_token === undefined) {
@@ -132,6 +133,7 @@ module.exports = function(app) {
       verifyToken(req, res, kid, id_token)
     }
   }
+
 }
 
 function verifyToken(req, res, kid, id_token) {
@@ -219,10 +221,10 @@ function getTokenFromCode(authCode, completion) {
 
 function tokenReceived(req, res, token) {
   // save tokens in session
-  req.session.access_token = token.token.access_token;
-  req.session.refresh_token = token.token.refresh_token;
+  req.session.access_token = token.token.access_token
+  req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
-  req.session.user_info = getInfoFromIDToken(token.token.id_token);
+  req.session.user_info = getInfoFromIDToken(token.token.id_token)
 }
 
 function getInfoFromIDToken(id_token) {
