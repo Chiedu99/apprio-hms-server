@@ -29,6 +29,8 @@ var jwt = require('jsonwebtoken');
 var request = require('request')
 var config = require('./config.js')
 var jwkToPem = require('jwk-to-pem')
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 
 
 module.exports = function(app) {
@@ -130,36 +132,49 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
           pem = jwkToPem(jwk);
-          jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-            if (err) {
-              console.log(err)
-              if (err.name === "TokenExpiredError") {
-                refreshToken(refresh_token, function(err, token) {
-                  if (err) {
-                    console.log(err)
-                    res.status(401).send({message: "Token expired. Couldn't refresh."})
-                  }
-                  else {
-                    console.log("Token refreshed.")
-                    tokenReceived(req, res, token)
-                    next()
-                  }
-                })
-              }
-              else {
-                console.log(err)
-                res.status(401).send({message: "Token invalid."})
-              }
-            }
-            else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-              console.log("User authenticated. Continue routing...")
-              next()
-            }
-            else {
-              res.status(403).send({message: "Couldn't decode token. Token invalid."})
-            }
-          }) 
-        }
+          const checkJwt = jwt({
+            // Dynamically provide a signing key
+            // based on the kid in the header and 
+            // the singing keys provided by the JWKS endpoint.
+            secret: jwksRsa.expressJwtSecret({
+              cache: true,
+              rateLimit: true,
+              jwksRequestsPerMinute: 5,
+              jwksUri: config.publicKeyURL
+            }),
+
+            algorithms: ['RS256']
+          });
+        //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
+        //     if (err) {
+        //       console.log(err)
+        //       if (err.name === "TokenExpiredError") {
+        //         refreshToken(refresh_token, function(err, token) {
+        //           if (err) {
+        //             console.log(err)
+        //             res.status(401).send({message: "Token expired. Couldn't refresh."})
+        //           }
+        //           else {
+        //             console.log("Token refreshed.")
+        //             tokenReceived(req, res, token)
+        //             next()
+        //           }
+        //         })
+        //       }
+        //       else {
+        //         console.log(err)
+        //         res.status(401).send({message: "Token invalid."})
+        //       }
+        //     }
+        //     else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+        //       console.log("User authenticated. Continue routing...")
+        //       next()
+        //     }
+        //     else {
+        //       res.status(403).send({message: "Couldn't decode token. Token invalid."})
+        //     }
+        //   }) 
+        // }
         else {
           res.status(401).send()
         }

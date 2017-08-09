@@ -1,4 +1,4 @@
-var access_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IkFRQUJBQUFBQUFCbmZpRy1tQTZOVGFlN0NkV1c3UWZkUnVQOUM0UUFDVmcwcWZKc2l5VnU3RVMtSFJldk5UWEhXZlpyVU43ZHZPWjRVRU9GaXJtZ2VPRlNpYXFNaHJvd1ljM2hOeFNSU3V4SEotT1FXbmdub1NBQSIsImFsZyI6IlJTMjU2IiwieDV0IjoiVldWSWMxV0QxVGtzYmIzMDFzYXNNNWtPcTVRIiwia2lkIjoiVldWSWMxV0QxVGtzYmIzMDFzYXNNNWtPcTVRIn0.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC82ZWQ0MjZlYS0xMmE2LTRhYWUtOGRkYi04N2Y4MDRhODA4MzAvIiwiaWF0IjoxNTAyMjA5MTU5LCJuYmYiOjE1MDIyMDkxNTksImV4cCI6MTUwMjIxMzA1OSwiYWNyIjoiMSIsImFpbyI6IlkyWmdZTEI1N3M2d05hNTRPbnNLbjdiWE1lbkY4eTc4blNnUXFzZ2FOYXZxd01YY3QwOEIiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkFwcHJpbyBIdWIgTWFuYWdlbWVudCBTeXN0ZW0iLCJhcHBpZCI6Ijk3NjAwN2U1LTg3NGYtNGQ2OC1hMmRkLTA0MDY1YjBiYWRlMyIsImFwcGlkYWNyIjoiMSIsImZhbWlseV9uYW1lIjoiUGFya2VyIiwiZ2l2ZW5fbmFtZSI6Ik1lY2NhIiwiaXBhZGRyIjoiMjA3Ljg3LjIwNy45OSIsIm5hbWUiOiJNZWNjYSBQYXJrZXIiLCJvaWQiOiI1MWIzNDkzNi01NDc4LTRkYjctODNkZS1jN2ZjOGFkOTZhZjgiLCJwbGF0ZiI6IjIiLCJwdWlkIjoiMTAwMzAwMDBBMUUzMjY4NiIsInNjcCI6IkNhbGVuZGFycy5SZWFkV3JpdGUgVXNlci5SZWFkIFVzZXIuUmVhZFdyaXRlIiwic3ViIjoicUNnTWV3cmRFMl8yeVh1a1pZSE14YWVoQkM0UWpHOGtZa0ZHcFpiSnJpNCIsInRpZCI6IjZlZDQyNmVhLTEyYTYtNGFhZS04ZGRiLTg3ZjgwNGE4MDgzMCIsInVuaXF1ZV9uYW1lIjoibXBhcmtlckBhcHByaW9pbmMuY29tIiwidXBuIjoibXBhcmtlckBhcHByaW9pbmMuY29tIiwidXRpIjoiZzk1c19oTzJGMDJZbTJHbVdOTXNBQSIsInZlciI6IjEuMCJ9.L6pafcyWhr382ql2i3LUQm_u4sCJblbOzU3q3FsuH2kEQd-pgp8OWl0y_ij-47BuwfCuV_YqeT-EEqRnlJu6CvbGnXUIoXGnqGKP6Gnpe_oc73oLpsf-iE88qsYKUpCMHV-hmIgGm_PrlEfF3q4bCGGKFFRsC8RYDzg38fZCxHYLP_eAw1qNG5zFUFmlImnyldrtUPKZNADwmS5kApiPbwQRhl8KSGDLHMZ2NZB5uGBSj3i2t2LITglMtadxGwPfIiAyI9pSD2Szf9IuOwvjsE1bjsActv39WgsG5ycDmTj6dzPttKfpuYHVp98l9X0oa6oJ5GjumWdu7JwQiZNDEw'
+var access_token = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IkFRQUJBQUFBQUFCbmZpRy1tQTZOVGFlN0NkV1c3UWZkZlc1WVcwY0Rsa21pVWVPZVp2S2VLamM2bURxVDhubTBhdHpJN3NuN3NQQlg4RHN0bXdQczhsaUY5ajZFTXJDSnhPRE9LM1g1cHBDdFhldWY3em5MM3lBQSIsImFsZyI6IlJTMjU2IiwieDV0IjoiVldWSWMxV0QxVGtzYmIzMDFzYXNNNWtPcTVRIiwia2lkIjoiVldWSWMxV0QxVGtzYmIzMDFzYXNNNWtPcTVRIn0.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC82ZWQ0MjZlYS0xMmE2LTRhYWUtOGRkYi04N2Y4MDRhODA4MzAvIiwiaWF0IjoxNTAyMjA4OTIwLCJuYmYiOjE1MDIyMDg5MjAsImV4cCI6MTUwMjIxMjgyMCwiYWNyIjoiMSIsImFpbyI6IkFTUUEyLzhEQUFBQW5wbFNhN3RJTERFYXB3VzM5Y2RHci9IT2hDeWZZMjZSbHJXZVFQTEpWRDg9IiwiYW1yIjpbInB3ZCJdLCJhcHBfZGlzcGxheW5hbWUiOiJBcHByaW8gSHViIE1hbmFnZW1lbnQgU3lzdGVtIiwiYXBwaWQiOiI5NzYwMDdlNS04NzRmLTRkNjgtYTJkZC0wNDA2NWIwYmFkZTMiLCJhcHBpZGFjciI6IjEiLCJmYW1pbHlfbmFtZSI6IlBhcmtlciIsImdpdmVuX25hbWUiOiJNZWNjYSIsImlwYWRkciI6IjIwNy44Ny4yMDcuOTkiLCJuYW1lIjoiTWVjY2EgUGFya2VyIiwib2lkIjoiNTFiMzQ5MzYtNTQ3OC00ZGI3LTgzZGUtYzdmYzhhZDk2YWY4IiwicGxhdGYiOiIyIiwicHVpZCI6IjEwMDMwMDAwQTFFMzI2ODYiLCJzY3AiOiJDYWxlbmRhcnMuUmVhZFdyaXRlIFVzZXIuUmVhZCBVc2VyLlJlYWRXcml0ZSIsInN1YiI6InFDZ01ld3JkRTJfMnlYdWtaWUhNeGFlaEJDNFFqRzhrWWtGR3BaYkpyaTQiLCJ0aWQiOiI2ZWQ0MjZlYS0xMmE2LTRhYWUtOGRkYi04N2Y4MDRhODA4MzAiLCJ1bmlxdWVfbmFtZSI6Im1wYXJrZXJAYXBwcmlvaW5jLmNvbSIsInVwbiI6Im1wYXJrZXJAYXBwcmlvaW5jLmNvbSIsInV0aSI6IjVOUmxLNUFFckVPeWZJR3RFUzAxQUEiLCJ2ZXIiOiIxLjAifQ.ZFjfzF7RSBJEaENrMPNJcaUFn9Mhl_giyQriWcjwjRyVZb8WVS3Ano3V7m6OPD8ESaJOdwZ9jSyBQq7h-cpf1-CVrOdC_EmI38gOfuqgzctIDpUvYncwJDk4C-S4rXEoP4dU6-kVIz-Pvg6e3Rb7pndx-oksCZQ-BLpkhhyU-fp4eAZPYpdpbyWZG1EmauLSLreYqzEeh_vFrqX67e-aJBz-e11MWxaMQ80I-9EcSAy4MZIo_0T0lUsi2DzJuE3RxoS8y69JFgLWAJHWfuVtf53NRxwCLoFA8zWoXucZ9GHnYEJMlsbbCSp0Buzwq481ACash4NocTd7o7_1A1OhPQ'
 var jwt = require('jsonwebtoken');
 var request = require('request')
 var config = require('./config.js')
@@ -6,53 +6,50 @@ var jwkToPem = require('jwk-to-pem')
 
 var assert = require('assert')
 var fs = require('fs')
-var pem2jwk = require('pem-jwk').pem2jwk
-var jwk2pem = require('pem-jwk').jwk2pem
  
-
+var RSA_PUBLIC_KEY = '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwxZQBChCrsCnhy+U6jWszJNnpSwYM3nmF7iwBkp0Qa57Wz7XQLnh\nUucZe/YkEJg6hJg16XAbZ/3oZnwLqQVlArfu5ldP9IdgOgPJYFGZXamE0v3BFtf1\nK2leiHqfmt06zJ2NhHCQ5p2yRzrrMV23kjK5bz8a/gQsdkIkBW7qE9TbJFU5D3zP\nk+sbJi7SIOLx5XRI6eFwu4z1IGooBbNiRopDEdcQizJqH/7PQJuBBk+a+ntI05mZ\naEZ2nbo8DDu046TEkqA2IRJ1FIvvdxrAi5NQ6E6YcYulNWxUaxBD2e42f9jmhBTB\nYknN23p3QEmRWvhgFRyDoK+M5XFw1H0mbwIDAQAB\n-----END RSA PUBLIC KEY-----'
 
 function test() {
     var decoded = jwt.decode(access_token, {complete: true})
     var kid = decoded.header.kid
     retrievePublicKey(kid, function(jwk) {
-    if (jwk) {
-        var pem = jwk2pem(jwk)
-        console.log(pem)
-        jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-        if (err) {
-            console.log(err)
-            if (err.name === "TokenExpiredError") {
-            refreshToken(refresh_token, function(err, token) {
+        if (jwk) {
+            console.log(jwk)
+            var pem = jwkToPem(jwk)
+            console.log(pem)
+            jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
                 if (err) {
-                console.log(err)
-                return
+                    console.log(err)
+                    if (err.name === "TokenExpiredError") {
+                    refreshToken(refresh_token, function(err, token) {
+                        if (err) {
+                        return
+                        }
+                        else {
+                        console.log("Token refreshed.")
+                        return
+                        }
+                    })
+                    }
+                    else {
+                    return
+                    }
+                }
+                else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+                    console.log("User authenticated. Continue routing...")
+                    return
                 }
                 else {
-                console.log("Token refreshed.")
-                return
+                    console.log("error")
+                    return 
                 }
-            })
-            }
-            else {
-            console.log(err)
-            return
-            }
-        }
-        else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-            console.log("User authenticated. Continue routing...")
-            return
+            }) 
         }
         else {
-            console.log("error")
-            return 
+            // console.log('error')
+            return
         }
-        }) 
-    }
-    else {
-        console.log('error')
-        return
-    }
-})
+    })
 }
 
 
