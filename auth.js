@@ -149,12 +149,10 @@ module.exports = function(app) {
             secret: secret,
             algorithms: ['RS256']
           }
-          const checkJwt = jwt(opts, function(req, res) {
-            console.log("Checking JWT")
-            console.log(req.user)
-            console.log("")
-            next()
-          });
+          const checkJwt = jwt(opts)
+          console.log("Checking JWT")
+          console.log(req.user)
+          console.log("")
         //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
         //     if (err) {
         //       console.log(err)
