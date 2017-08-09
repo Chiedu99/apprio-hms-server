@@ -136,23 +136,37 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
           pem = jwkToPem(jwk);
-          var secret = jwksRsa.expressJwtSecret({
-              cache: true,
-              rateLimit: true,
-              jwksRequestsPerMinute: 5,
-              jwksUri: config.publicKeyURL
-            })
-          console.log("***SECRET***")
-          console.log(secret)
-          console.log("")
-          var opts = {
-            secret: secret,
-            algorithms: ['RS256']
-          }
-          const checkJwt = jwt(opts)
-          console.log("Checking JWT")
-          console.log(req.user)
-          console.log("")
+          const jwksClient = require('jwks-rsa');
+ 
+          const client = jwksClient({
+            strictSsl: true, // Default value 
+            jwksUri: 'https://sandrino.auth0.com/.well-known/jwks.json'
+          });
+          
+          client.getSigningKey(kid, (err, key) => {
+            console.log("***KEY***", key)
+            const signingKey = key.publicKey || key.rsaPublicKey;
+            console.log("***SECRET***")
+            console.log(secret)
+            console.log("")
+            var opts = {
+              secret: signingKey,
+              algorithms: ['RS256']
+            }
+            const checkJwt = jwt(opts)
+            console.log("Checking JWT")
+            console.log(req.user)
+            console.log("")
+          
+            // Now I can use this to configure my Express or Hapi middleware 
+          });
+          // var secret = jwksRsa.expressJwtSecret({
+          //     cache: true,
+          //     rateLimit: true,
+          //     jwksRequestsPerMinute: 5,
+          //     jwksUri: config.publicKeyURL
+          //   })
+
         //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
         //     if (err) {
         //       console.log(err)
