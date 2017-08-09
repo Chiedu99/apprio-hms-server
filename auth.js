@@ -122,11 +122,11 @@ module.exports = function(app) {
   function authenticate(req, res, next) {
     var access_token = req.session.access_token
     var refresh_token = req.session.refresh_token
-    var secret = app.get("secret")
-    if (access_token === undefined || refresh_token === undefined) {
-      res.status(401).send({message: "No token given."})
-    }
-    else {
+
+    // if (access_token === undefined || refresh_token === undefined) {
+    //   res.status(401).send({message: "No token given."})
+    // }
+
       var decoded = jwtdecode.decode(access_token, {complete: true})
       var kid = decoded.header.kid
       retrievePublicKey(kid, function(jwk) {
@@ -135,9 +135,6 @@ module.exports = function(app) {
           console.log(req.headers)
           
           const checkJwt = jwt({
-            // Dynamically provide a signing key
-            // based on the kid in the header and 
-            // the singing keys provided by the JWKS endpoint.
             secret: jwksRsa.expressJwtSecret({
               cache: true,
               rateLimit: true,
@@ -185,7 +182,7 @@ module.exports = function(app) {
         }
       })
     }
-  }
+  
 }
 
 function retrievePublicKey(kid, completion) {
