@@ -145,7 +145,7 @@ module.exports = function(app) {
               jwksUri: config.publicKeyURL
             }),
 
-            algorithms: ['RS255']
+            algorithms: ['RS256']
           });
           console.log('passed')
           next()
