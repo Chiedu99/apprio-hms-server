@@ -136,22 +136,25 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
           pem = jwkToPem(jwk);
-          var opts = {
-            secret: jwksRsa.expressJwtSecret({
+          var secret = jwksRsa.expressJwtSecret({
               cache: true,
               rateLimit: true,
               jwksRequestsPerMinute: 5,
               jwksUri: config.publicKeyURL
-            }),
-
+            })
+          console.log("***SECRET***")
+          console.log(secret)
+          console.log("")
+          var opts = {
+            secret: secret,
             algorithms: ['RS256']
           }
           const checkJwt = jwt(opts, function(req, res) {
             console.log("Checking JWT")
             console.log(req.user)
             console.log("")
+            next()
           });
-          next()
         //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
         //     if (err) {
         //       console.log(err)
