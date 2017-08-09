@@ -122,8 +122,6 @@ module.exports = function(app) {
     console.log("***AUTHENTICATING***")
     console.log(req.headers)
     console.log("")
-    console.log(req.user)
-    console.log("")
     var access_token = req.session.access_token
     var refresh_token = req.session.refresh_token
 
@@ -143,7 +141,7 @@ module.exports = function(app) {
           });
           
           client.getSigningKey(kid, (err, key) => {
-            cnsole.log(err)
+            console.log(err)
             console.log("***KEY***", key)
             const signingKey = key.publicKey || key.rsaPublicKey;
             console.log("***SECRET***")
