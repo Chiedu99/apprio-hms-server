@@ -133,8 +133,7 @@ module.exports = function(app) {
         if (jwk) {
           pem = jwkToPem(jwk);
           console.log(req.headers)
-          
-          const checkJwt = jwt({
+          var opts = {
             secret: jwksRsa.expressJwtSecret({
               cache: true,
               rateLimit: true,
@@ -143,8 +142,10 @@ module.exports = function(app) {
             }),
 
             algorithms: ['RS256']
+          }
+          const checkJwt = jwt(opts, function(req, res) {
+            console.log(req.user)
           });
-          console.log('passed')
           next()
         //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
         //     if (err) {
