@@ -123,7 +123,8 @@ module.exports = function(app) {
     console.log("Authenticating...")
     var id_token = req.session.id_token
     var refresh_token = req.session.refresh_token
-    console.log(id_token, refresh_token)
+    console.log(id_token)
+    console.log(refresh_token)
     if (id_token === undefined || refresh_token === undefined) {
       res.status(401).send({message: "No token given."})
     }
