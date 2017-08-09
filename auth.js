@@ -138,7 +138,7 @@ module.exports = function(app) {
           pem = jwkToPem(jwk);
           const jwksClient = require('jwks-rsa');
  
-          const client = jwksClient({
+          const client = jwksRsa({
             strictSsl: true, // Default value 
             jwksUri: 'https://sandrino.auth0.com/.well-known/jwks.json'
           });
