@@ -120,103 +120,55 @@ module.exports = function(app) {
   })
 
   function authenticate(req, res, next) {
-    console.log("***AUTHENTICATING***")
-    console.log(req.headers)
-    console.log("")
-    var access_token = req.session.access_token
+    console.log("Authenticating...")
+    var id_token = req.session.id_token
     var refresh_token = req.session.refresh_token
-
-    // if (access_token === undefined || refresh_token === undefined) {
-    //   res.status(401).send({message: "No token given."})
-    // }
-
-      var decoded = jwt.decode(access_token, {complete: true})
-      var kid = decoded.header.kid
-      retrievePublicKey(kid, function(jwk) {
-        if (jwk) {
-          pem = jwkToPem(jwk);
- 
-          const client = jwksRsa({
-            strictSsl: true, // Default value 
-            jwksUri: config.publicKeyURL
-          });
-          
-          client.getSigningKey(kid, (err, key) => {
-            console.log(err)
-            const signingKey = key.publicKey || key.rsaPublicKey;
-            console.log(signingKey)
-
-            jwt.verify(access_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
-              if (err) {
-                console.log(err)
-                if (err.name === "TokenExpiredError") {
-                  refreshToken(refresh_token, function(err, token) {
-                    if (err) {
-                      console.log(err)
-                      res.status(401).send({message: "Token expired. Couldn't refresh."})
-                    }
-                    else {
-                      console.log("Token refreshed.")
-                      tokenReceived(req, res, token)
-                      next()
-                    }
-                  })
-                }
-                else {
-                  console.log(err)
-                  res.status(401).send({message: "Token invalid."})
-                }
-              }
-              else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-                console.log("User authenticated. Continue routing...")
-                next()
-              }
-              else {
-                res.status(403).send({message: "Couldn't decode token. Token invalid."})
-              }
-            }) 
-          })
-            // var opts = {
-            //   secret: signingKey,
-            //   algorithms: ['RS256']
-            // }
-            // const checkJwt = jwt(opts)
-            // console.log("Checking JWT")
-            // console.log(req.user)
-            // console.log("")
-          
-            // Now I can use this to configure my Express or Hapi middleware 
-          // var secret = jwksRsa.expressJwtSecret({
-          //     cache: true,
-          //     rateLimit: true,
-          //     jwksRequestsPerMinute: 5,
-          //     jwksUri: config.publicKeyURL
-          //   })
-
-        //   
-        }
-      })
+    if (id_token === undefined || refresh_token === undefined) {
+      res.status(401).send({message: "No token given."})
     }
-  
+    else {
+      var decoded = jwt.decode(id_token, {complete: true})
+      var kid = decoded.header.kid
+      verifyToken(req, res, kid)
+    }
 }
 
-function retrievePublicKey(kid, completion) {
-  var options = {
-    url: config.publicKeyURL,
-    headers: {
-      'Content-Type': 'application/json'
+function verifyToken(req, res, kid) {
+  var clientOpts = {
+      strictSsl: true, 
+      jwksUri: process.env.PUBLIC_KEY_URL || config.publicKeyURL
     }
-  }
-  request(options, function (err, res, body) {
-    var info = JSON.parse(body)
-    var keys = info["keys"]
-    for (i=0; i < keys.length; i++) {
-      var jwk = keys[i]
-      if (jwk.kid == kid) {
-        completion(jwk)
+  const client = jwksRsa(clientOpts)
+  client.getSigningKey(kid, (err, key) => {
+    const signingKey = key.publicKey || key.rsaPublicKey;
+    jwt.verify(access_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
+      if (err) {
+        console.log(err)
+        if (err.name === "TokenExpiredError") {
+          refreshToken(refresh_token, function(err, token) {
+            if (err) {
+              console.log(err)
+              res.status(401).send({message: "Token expired. Couldn't refresh."})
+            }
+            else {
+              console.log("Token refreshed.")
+              tokenReceived(req, res, token)
+              next()
+            }
+          })
+        }
+        else {
+          res.status(401).send({message: "Token invalid."})
+        }
       }
-    }
-    completion(null)
+      else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+        console.log("User authenticated. Continue routing...")
+        next()
+      }
+      else {
+        res.status(401).send({message: "Couldn't decode token. Token invalid."})
+      }
+    }) 
   })
 }
 
@@ -262,7 +214,7 @@ function tokenReceived(req, res, token) {
   // save tokens in session
   req.session.access_token = token.token.access_token;
   req.session.refresh_token = token.token.refresh_token;
-  console.log(token.token)
+  req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token);
 }
 
