@@ -144,14 +144,45 @@ module.exports = function(app) {
             console.log(err)
             const signingKey = key.publicKey || key.rsaPublicKey;
             console.log(signingKey)
-            var opts = {
-              secret: signingKey,
-              algorithms: ['RS256']
-            }
-            const checkJwt = jwt(opts)
-            console.log("Checking JWT")
-            console.log(req.user)
-            console.log("")
+
+            jwt.verify(access_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
+              if (err) {
+                console.log(err)
+                if (err.name === "TokenExpiredError") {
+                  refreshToken(refresh_token, function(err, token) {
+                    if (err) {
+                      console.log(err)
+                      res.status(401).send({message: "Token expired. Couldn't refresh."})
+                    }
+                    else {
+                      console.log("Token refreshed.")
+                      tokenReceived(req, res, token)
+                      next()
+                    }
+                  })
+                }
+                else {
+                  console.log(err)
+                  res.status(401).send({message: "Token invalid."})
+                }
+              }
+              else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+                console.log("User authenticated. Continue routing...")
+                next()
+              }
+              else {
+                res.status(403).send({message: "Couldn't decode token. Token invalid."})
+              }
+            }) 
+          }
+            // var opts = {
+            //   secret: signingKey,
+            //   algorithms: ['RS256']
+            // }
+            // const checkJwt = jwt(opts)
+            // console.log("Checking JWT")
+            // console.log(req.user)
+            // console.log("")
           
             // Now I can use this to configure my Express or Hapi middleware 
           });
@@ -162,39 +193,7 @@ module.exports = function(app) {
           //     jwksUri: config.publicKeyURL
           //   })
 
-        //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
-        //     if (err) {
-        //       console.log(err)
-        //       if (err.name === "TokenExpiredError") {
-        //         refreshToken(refresh_token, function(err, token) {
-        //           if (err) {
-        //             console.log(err)
-        //             res.status(401).send({message: "Token expired. Couldn't refresh."})
-        //           }
-        //           else {
-        //             console.log("Token refreshed.")
-        //             tokenReceived(req, res, token)
-        //             next()
-        //           }
-        //         })
-        //       }
-        //       else {
-        //         console.log(err)
-        //         res.status(401).send({message: "Token invalid."})
-        //       }
-        //     }
-        //     else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-        //       console.log("User authenticated. Continue routing...")
-        //       next()
-        //     }
-        //     else {
-        //       res.status(403).send({message: "Couldn't decode token. Token invalid."})
-        //     }
-        //   }) 
-        // }
-        // else {
-        //   res.status(401).send()
-        // }
+        //   
         }
       })
     }
