@@ -147,7 +147,7 @@ module.exports = function(app) {
             algorithms: ['RS256']
           });
           console.log('passed')
-          res.status(200)
+          next()
         //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
         //     if (err) {
         //       console.log(err)
