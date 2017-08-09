@@ -142,6 +142,7 @@ module.exports = function(app) {
           
           client.getSigningKey(kid, (err, key) => {
             console.log(err)
+            console.log(kid)
             console.log("***KEY***", key)
             const signingKey = key.publicKey || key.rsaPublicKey;
             console.log(signingKey)
