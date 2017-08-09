@@ -133,6 +133,7 @@ module.exports = function(app) {
         if (jwk) {
           pem = jwkToPem(jwk);
           console.log(req.headers)
+          
           const checkJwt = jwt({
             // Dynamically provide a signing key
             // based on the kid in the header and 
@@ -144,7 +145,7 @@ module.exports = function(app) {
               jwksUri: config.publicKeyURL
             }),
 
-            algorithms: ['RS256']
+            algorithms: ['RS255']
           });
           console.log('passed')
           next()
