@@ -128,13 +128,13 @@ module.exports = function(app) {
     else {
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
-      verifyToken(req, res, kid, id_token)
+      verifyToken(req, res, kid, id_token, next)
     }
   }
 
 }
 
-function verifyToken(req, res, kid, id_token) {
+function verifyToken(req, res, kid, id_token, next) {
   var clientOpts = {
       strictSsl: true, 
       jwksUri: process.env.PUBLIC_KEY_URL || config.publicKeyURL
