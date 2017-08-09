@@ -149,10 +149,10 @@ module.exports = function(app) {
               secret: signingKey,
               algorithms: ['RS256']
             }
-            const checkJwt = jwt(opts)
-            console.log("Checking JWT")
-            console.log(req.user)
-            console.log("")
+            // const checkJwt = jwt(opts)
+            // console.log("Checking JWT")
+            // console.log(req.user)
+            // console.log("")
           
             // Now I can use this to configure my Express or Hapi middleware 
           });
