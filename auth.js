@@ -25,11 +25,12 @@ var cookieParser = require('cookie-parser')
 var session = require('express-session')
 var bodyParser = require('body-parser')
 var colors = require('colors')
-var jwtdecode = require('jsonwebtoken');
+var jwt = require('jsonwebtoken');
 var request = require('request')
 var config = require('./config.js')
 var jwkToPem = require('jwk-to-pem')
-const jwt = require('express-jwt');
+// const jwt = require('express-jwt');
+
 const jwksRsa = require('jwks-rsa');
 
 
@@ -129,7 +130,7 @@ module.exports = function(app) {
     //   res.status(401).send({message: "No token given."})
     // }
 
-      var decoded = jwtdecode.decode(access_token, {complete: true})
+      var decoded = jwt.decode(access_token, {complete: true})
       var kid = decoded.header.kid
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
