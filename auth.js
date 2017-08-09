@@ -95,7 +95,6 @@ module.exports = function(app) {
         }
         else {
           tokenReceived(req, res, token)
-          console.log(token)
           var data = {
             access_token: req.session.access_token,
             refresh_token: req.session.refresh_token,
@@ -262,6 +261,7 @@ function tokenReceived(req, res, token) {
   // save tokens in session
   req.session.access_token = token.token.access_token;
   req.session.refresh_token = token.token.refresh_token;
+  console.log(token.token)
   req.session.user_info = getInfoFromIDToken(token.token.id_token);
 }
 
