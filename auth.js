@@ -136,14 +136,14 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
           pem = jwkToPem(jwk);
-          const jwksClient = require('jwks-rsa');
  
           const client = jwksRsa({
             strictSsl: true, // Default value 
-            jwksUri: 'https://sandrino.auth0.com/.well-known/jwks.json'
+            jwksUri: config.publicKeyURL
           });
           
           client.getSigningKey(kid, (err, key) => {
+            cnsole.log(err)
             console.log("***KEY***", key)
             const signingKey = key.publicKey || key.rsaPublicKey;
             console.log("***SECRET***")
