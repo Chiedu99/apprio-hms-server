@@ -129,12 +129,12 @@ module.exports = function(app) {
     else {
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
-      verifyToken(req, res, kid)
+      verifyToken(req, res, kid, id_token)
     }
-}
+  }
 }
 
-function verifyToken(req, res, kid) {
+function verifyToken(req, res, kid, id_token) {
   var clientOpts = {
       strictSsl: true, 
       jwksUri: process.env.PUBLIC_KEY_URL || config.publicKeyURL
@@ -147,7 +147,7 @@ function verifyToken(req, res, kid) {
     }
     else {
       const signingKey = key.publicKey || key.rsaPublicKey;
-      jwt.verify(access_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
+      jwt.verify(id_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
         if (err) {
           console.log(err)
           if (err.name === "TokenExpiredError") {
