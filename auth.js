@@ -119,7 +119,8 @@ module.exports = function(app) {
 
   function authenticate(req, res, next) {
     console.log("Authenticating...")
-    var id_token = req.session.id_token
+    var id_token = req.session.id_token || req.headers.authorization
+    console.log(id_token)
     var refresh_token = req.session.refresh_token
     if (id_token === undefined || refresh_token === undefined) {
       console.log("No tokens given")
