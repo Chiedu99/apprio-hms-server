@@ -72,7 +72,6 @@ module.exports = function(app) {
         }
         else {
           tokenReceived(req, res, token)
-          console.log(req.session)
           res.status(200).send({success: true})
         }
       })
@@ -120,6 +119,11 @@ module.exports = function(app) {
   })
 
   function authenticate(req, res, next) {
+    console.log("***AUTHENTICATING***")
+    console.log(req.headers)
+    console.log("")
+    console.log(req.user)
+    console.log("")
     var access_token = req.session.access_token
     var refresh_token = req.session.refresh_token
 
@@ -132,7 +136,6 @@ module.exports = function(app) {
       retrievePublicKey(kid, function(jwk) {
         if (jwk) {
           pem = jwkToPem(jwk);
-          console.log(req.headers)
           var opts = {
             secret: jwksRsa.expressJwtSecret({
               cache: true,
@@ -144,7 +147,9 @@ module.exports = function(app) {
             algorithms: ['RS256']
           }
           const checkJwt = jwt(opts, function(req, res) {
+            console.log("Checking JWT")
             console.log(req.user)
+            console.log("")
           });
           next()
         //   jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {

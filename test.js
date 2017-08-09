@@ -9,6 +9,29 @@ var fs = require('fs')
  
 var RSA_PUBLIC_KEY = '-----BEGIN RSA PUBLIC KEY-----\nMIIBCgKCAQEAwxZQBChCrsCnhy+U6jWszJNnpSwYM3nmF7iwBkp0Qa57Wz7XQLnh\nUucZe/YkEJg6hJg16XAbZ/3oZnwLqQVlArfu5ldP9IdgOgPJYFGZXamE0v3BFtf1\nK2leiHqfmt06zJ2NhHCQ5p2yRzrrMV23kjK5bz8a/gQsdkIkBW7qE9TbJFU5D3zP\nk+sbJi7SIOLx5XRI6eFwu4z1IGooBbNiRopDEdcQizJqH/7PQJuBBk+a+ntI05mZ\naEZ2nbo8DDu046TEkqA2IRJ1FIvvdxrAi5NQ6E6YcYulNWxUaxBD2e42f9jmhBTB\nYknN23p3QEmRWvhgFRyDoK+M5XFw1H0mbwIDAQAB\n-----END RSA PUBLIC KEY-----'
 
+
+const express = require('express');
+const app = express();
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
+
+// Authentication middleware. When used, the
+// access token must exist and be verified against
+// the Auth0 JSON Web Key Set
+const checkJwt = jwt({
+  // Dynamically provide a signing key
+  // based on the kid in the header and 
+  // the singing keys provided by the JWKS endpoint.
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: config.publicKeyURL
+  }),
+
+  algorithms: ['RS256']
+});
+
 function test() {
     var decoded = jwt.decode(access_token, {complete: true})
     var kid = decoded.header.kid
@@ -20,20 +43,7 @@ function test() {
             jwt.verify(access_token, pem, { algorithms: ['RS256'] }, function(err, decoded) {
                 if (err) {
                     console.log(err)
-                    if (err.name === "TokenExpiredError") {
-                    refreshToken(refresh_token, function(err, token) {
-                        if (err) {
-                        return
-                        }
-                        else {
-                        console.log("Token refreshed.")
-                        return
-                        }
-                    })
-                    }
-                    else {
                     return
-                    }
                 }
                 else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
                     console.log("User authenticated. Continue routing...")
@@ -46,7 +56,6 @@ function test() {
             }) 
         }
         else {
-            // console.log('error')
             return
         }
     })
