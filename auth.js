@@ -141,35 +141,41 @@ function verifyToken(req, res, kid) {
     }
   const client = jwksRsa(clientOpts)
   client.getSigningKey(kid, (err, key) => {
-    const signingKey = key.publicKey || key.rsaPublicKey;
-    jwt.verify(access_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
-      if (err) {
-        console.log(err)
-        if (err.name === "TokenExpiredError") {
-          refreshToken(refresh_token, function(err, token) {
-            if (err) {
-              console.log(err)
-              res.status(401).send({message: "Token expired. Couldn't refresh."})
-            }
-            else {
-              console.log("Token refreshed.")
-              tokenReceived(req, res, token)
-              next()
-            }
-          })
+    if (err) {
+      console.log(err)
+      res.status(401).send({message: err})
+    }
+    else {
+      const signingKey = key.publicKey || key.rsaPublicKey;
+      jwt.verify(access_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
+        if (err) {
+          console.log(err)
+          if (err.name === "TokenExpiredError") {
+            refreshToken(refresh_token, function(err, token) {
+              if (err) {
+                console.log(err)
+                res.status(401).send({message: "Token expired. Couldn't refresh."})
+              }
+              else {
+                console.log("Token refreshed.")
+                tokenReceived(req, res, token)
+                next()
+              }
+            })
+          }
+          else {
+            res.status(401).send({message: "Token invalid."})
+          }
+        }
+        else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+          console.log("User authenticated. Continue routing...")
+          next()
         }
         else {
-          res.status(401).send({message: "Token invalid."})
+          res.status(401).send({message: "Couldn't decode token. Token invalid."})
         }
-      }
-      else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
-        console.log("User authenticated. Continue routing...")
-        next()
-      }
-      else {
-        res.status(401).send({message: "Couldn't decode token. Token invalid."})
-      }
-    }) 
+      }) 
+    }
   })
 }
 
