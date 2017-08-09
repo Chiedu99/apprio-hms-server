@@ -26,10 +26,7 @@ var session = require('express-session')
 var bodyParser = require('body-parser')
 var colors = require('colors')
 var jwt = require('jsonwebtoken');
-var request = require('request')
 var config = require('./config.js')
-var jwkToPem = require('jwk-to-pem')
-// const jwt = require('express-jwt');
 
 const jwksRsa = require('jwks-rsa');
 
