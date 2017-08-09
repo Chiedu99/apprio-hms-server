@@ -99,6 +99,7 @@ module.exports = function(app) {
           var data = {
             access_token: req.session.access_token,
             refresh_token: req.session.refresh_token,
+            id_token: req.session.id_token,
             user_info: req.session.user_info
           }
           console.log(data)
@@ -123,9 +124,8 @@ module.exports = function(app) {
     console.log("Authenticating...")
     var id_token = req.session.id_token
     var refresh_token = req.session.refresh_token
-    console.log(id_token)
-    console.log(refresh_token)
     if (id_token === undefined || refresh_token === undefined) {
+      console.log("No tokens given")
       res.status(401).send({message: "No token given."})
     }
     else {
@@ -170,7 +170,7 @@ function verifyToken(req, res, kid, id_token) {
             res.status(401).send({message: "Token invalid."})
           }
         }
-        else if (decoded.name && decoded.unique_name && decoded.app_displayname && decoded.aud) {
+        else if (decoded.name && decoded.iss && decoded.aud) {
           console.log("User authenticated. Continue routing...")
           next()
         }
