@@ -144,9 +144,7 @@ module.exports = function(app) {
             console.log(err)
             console.log("***KEY***", key)
             const signingKey = key.publicKey || key.rsaPublicKey;
-            console.log("***SECRET***")
-            console.log(secret)
-            console.log("")
+            console.log(signingKey)
             var opts = {
               secret: signingKey,
               algorithms: ['RS256']
