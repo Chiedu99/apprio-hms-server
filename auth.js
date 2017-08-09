@@ -132,6 +132,7 @@ module.exports = function(app) {
       verifyToken(req, res, kid)
     }
 }
+}
 
 function verifyToken(req, res, kid) {
   var clientOpts = {
