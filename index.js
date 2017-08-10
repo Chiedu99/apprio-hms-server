@@ -1,6 +1,10 @@
-/* 
- * Server initialization 
- */
+////////////////////////////////////////////////////////////////
+// Server initialization
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+// Imports
+////////////////////////////////////////////////////////////////
 
 var moment = require('moment');
 var querystring = require('querystring');
@@ -12,16 +16,19 @@ var colors = require('colors')
 var bodyParser = require('body-parser')
 
 var db = require('./db')
-var config = require('./config.js')
+var config = require('./.config.js')
 var auth = require('./auth.js')
   
+////////////////////////////////////////////////////////////////
+// Server object
+////////////////////////////////////////////////////////////////
 
 // Define HTTP routes through the app object's methods
 var Server = function() {
 	var self = this
 
 	self.setupVariables = function () {
-		self.port = process.env.PORT || 8000
+		self.port = process.env.PORT || config.port
 	}
 
 	// Initialize App
@@ -58,7 +65,7 @@ var Server = function() {
         })
     }
 }
-
+// Test database connection and start server
 db.testConnection(function(err) {
     server = new Server()
     console.log("%s", Date(Date.now()))
@@ -74,4 +81,3 @@ db.testConnection(function(err) {
     }
 })
 
-// // Only start server if database can be reached

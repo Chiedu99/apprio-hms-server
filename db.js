@@ -1,9 +1,13 @@
-/* 
- * Create and export database methods
- */
+////////////////////////////////////////////////////////////////
+// Database methods
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+// Imports and initialization variables
+////////////////////////////////////////////////////////////////
 
 var promise = require('bluebird')
-var config = require('./config.js')
+var config = require('./.config.js')
 
 var options = {
   // Initialization Options
@@ -11,15 +15,11 @@ var options = {
 }
 
 var pgp = require('pg-promise')(options)
-var cn = {
-			host: 'ec2-54-235-168-152.compute-1.amazonaws.com',
-			port: 5432,
-			database: 'd6kcqlbbrac5bn',
-			user: 'mxtnxulynacpcj',
-			password: 'f341e82d34b37bd59dc6b92ce133863eafa9caa80c5eccfbe06cedde1b1a59f0'
-			}
+var db = pgp(config.dbURL); 
 
-var db = pgp('postgres://mxtnxulynacpcj:f341e82d34b37bd59dc6b92ce133863eafa9caa80c5eccfbe06cedde1b1a59f0@ec2-54-235-168-152.compute-1.amazonaws.com:5432/d6kcqlbbrac5bn?ssl=true'); 
+////////////////////////////////////////////////////////////////
+// Exports
+////////////////////////////////////////////////////////////////
 
 var testConnection = function(completion) {
 	db.connect()
@@ -28,6 +28,17 @@ var testConnection = function(completion) {
 	})
 	.catch(function(err) {
 		completion(err)
+	})
+}
+
+var retrieveUsers = function(completion) {
+	var query = 'SELECT ARRAY(SELECT email FROM users)'
+	db.any(query)
+	.then(function(data) {
+		completion(null, data)
+	})
+	.catch(function(err) {
+		completion(err, null)
 	})
 }
 
@@ -220,10 +231,9 @@ var toggleMute = function(id, completion) {
 	})
 }
 
-
-
 var methods = {
 	testConnection: testConnection,
+	retrieveUsers: retrieveUsers,
 	getHubs: getHubs,
 	getHub: getHub,
 	createHub: createHub, 

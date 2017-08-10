@@ -1,12 +1,36 @@
-var clientID = '976007e5-874f-4d68-a2dd-04065b0bade3';
-var clientSecret = 'CRove2sVeFmFNFuoPFYtLS2';
-var redirectUri = 'https://apprio-pi-server-heroku.herokuapp.com/authorize';
+
+////////////////////////////////////////////////////////////////
+// Route Authorization
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+// Imports
+////////////////////////////////////////////////////////////////
+
+var cookieParser = require('cookie-parser')
+var session = require('express-session')
+var bodyParser = require('body-parser')
+var colors = require('colors')
+
+var config = require('./.config.js')
+var db = require('./db')
+var jwt = require('jsonwebtoken');
+const jwksRsa = require('jwks-rsa');
+
+
+////////////////////////////////////////////////////////////////
+// Config Variables
+////////////////////////////////////////////////////////////////
+
+var clientID = process.env.CLIENT_ID || config.clientID
+var clientSecret = process.env.CLIENT_SECRET || config.clientSecret
+var redirectUri = process.env.REDIRECT_URI || config.redirectUri
 
 var scopes = [
   'openid',
   'profile',
   'user.read'
-];
+]
 
 const credentials = {
   client: {
@@ -14,53 +38,44 @@ const credentials = {
     secret: clientSecret
   },
   auth: {
-    tokenHost: 'https://login.microsoftonline.com',
-    authorizePath: '/common/oauth2/v2.0/authorize',
-    tokenPath: '/common/oauth2/v2.0/token'
+    tokenHost: process.env.TOKEN_HOST || config.tokenHost,
+    authorizePath: process.env.AUTHORIZE_PATH || config.authorizePath,
+    tokenPath: process.env.TOKEN_PATH || config.tokenPath
   }
 };
 
 var oauth2 = require('simple-oauth2').create(credentials)
-var cookieParser = require('cookie-parser')
-var session = require('express-session')
-var bodyParser = require('body-parser')
-var colors = require('colors')
-var jwt = require('jsonwebtoken');
-var config = require('./config.js')
 
-const jwksRsa = require('jwks-rsa');
-
+////////////////////////////////////////////////////////////////
+// Exports 
+////////////////////////////////////////////////////////////////
 
 module.exports = function(app) {
-  // Need JSON body parser for most API responses
-  app.use(bodyParser.json());
-
-  // Set up cookies and sessions to save tokens
-  app.use(cookieParser());
-
-  app.use(session(
-    { secret: '81b8b800-31ad-480b-9dcf-bc93a7debf08',
-      resave: false,
-      saveUninitialized: false 
-  }));
 
   app.use(bodyParser.json())
-
+  app.use(cookieParser())
+  app.use(session(
+    { secret: process.env.SESSION_SECRET || config.secret,
+      resave: false,
+      saveUninitialized: false 
+  }))
+  app.use(bodyParser.json())
+  app.set("authenticate", authenticate)
+  // Set necessary headers for every request
   app.use(function(req, res, next) {
-      res.set('Access-Control-Allow-Origin', '*')
-      res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
-      res.set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
-      next();
+    res.set('Access-Control-Allow-Origin', '*')
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+    res.set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
+    next();
   })
-
-  app.set('authenticate', authenticate)
 
   app.get('/', function(req, res) {
     res.redirect('/authorize')
   })
 
+  // Extract token from auth code and return the authorization URL
   app.get('/authorize', function(req, res) {
-    console.log((req.url).blue)
+    console.log('/authorize'.blue)
     var authCode = req.query.code
     if (authCode) {
       getTokenFromCode(authCode, function(err, token) {
@@ -69,7 +84,8 @@ module.exports = function(app) {
           res.status(401).send({message: err})
         }
         else {
-          tokenReceived(req, res, token)
+          saveTokenData(req, token)
+          verifyUser(req, res, next)
           console.log(token)
           res.status(200).send({success: true})
         }
@@ -82,8 +98,9 @@ module.exports = function(app) {
     }
   })
 
+  // Extract user data from the token
   app.get('/getTokenData', function(req, res) {
-    console.log((req.url).blue)
+    console.log('/getTokenData'.blue)
     var authCode = req.query.code
     if (authCode) {
       getTokenFromCode(authCode, function(err, token) {
@@ -92,7 +109,7 @@ module.exports = function(app) {
           res.status(401).send({message: err})
         }
         else {
-          tokenReceived(req, res, token)
+          saveTokenData(req, token)
           var data = {
             access_token: req.session.access_token,
             refresh_token: req.session.refresh_token,
@@ -105,28 +122,30 @@ module.exports = function(app) {
       })
     } 
     else {
-      console.log("No auth token given.")
-      res.status(400).send()
+      console.log("No auth code given.")
+      res.status(400).send({message: "No auth code given."})
     }
   })
 
+  // Log a user out of the session
   app.get('/logout', function(req, res) {
-    console.log((req.url).blue)
+    console.log('/logout'.blue)
     req.session.destroy()
     console.log("Logged out.")
     res.status(201).send()
   })
 
+  // Authenticate user before completing route
   function authenticate(req, res, next) {
     console.log("Authenticating...")
     var id_token = req.session.id_token || req.headers.id_token
     var refresh_token = req.session.refresh_token || req.headers.refresh_token
-    console.log(req.headers)
     if (id_token === undefined || refresh_token === undefined) {
-      console.log("No tokens given")
+      console.log("No tokens given.")
       res.status(401).send({message: "No token given."})
     }
     else {
+      // decode id_token the verify it
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
       verifyToken(req, res, kid, id_token, refresh_token, next)
@@ -135,12 +154,18 @@ module.exports = function(app) {
 
 }
 
+////////////////////////////////////////////////////////////////
+// Helper functions
+////////////////////////////////////////////////////////////////
+
+// Verify id_token and refresh it if it's expired
 function verifyToken(req, res, kid, id_token, refresh_token, next) {
   var clientOpts = {
       strictSsl: true, 
       jwksUri: process.env.PUBLIC_KEY_URL || config.publicKeyURL
     }
   const client = jwksRsa(clientOpts)
+  // retrieve pem public key from Microsoft api
   client.getSigningKey(kid, (err, key) => {
     if (err) {
       console.log(err)
@@ -148,29 +173,19 @@ function verifyToken(req, res, kid, id_token, refresh_token, next) {
     }
     else {
       const signingKey = key.publicKey || key.rsaPublicKey;
+      // verify/refresh token
       jwt.verify(id_token, signingKey, { algorithms: ['RS256'] }, function(err, decoded) {
         if (err) {
           console.log(err)
           if (err.name === "TokenExpiredError") {
-            refreshToken(refresh_token, function(err, token) {
-              if (err) {
-                console.log(err)
-                res.status(401).send({message: "Token expired. Couldn't refresh."})
-              }
-              else {
-                console.log("Token refreshed.")
-                tokenReceived(req, res, token)
-                next()
-              }
-            })
+            refreshToken(req, res, next, refresh_token) 
           }
           else {
             res.status(401).send({message: "Token invalid."})
           }
         }
         else if (decoded.name && decoded.iss && decoded.aud) {
-          console.log("User authenticated. Continue routing...")
-          next()
+          verifyUser(req, res, next)
         }
         else {
           res.status(401).send({message: "Couldn't decode token. Token invalid."})
@@ -180,18 +195,50 @@ function verifyToken(req, res, kid, id_token, refresh_token, next) {
   })
 }
 
-function refreshToken(refresh_token, completion) {
+// Refresh the token 
+function refreshToken(req, res, next, refresh_token) {
   if (refresh_token === undefined) {
-    var err = "No refresh token in session."
-    completion(err, null)
+    console.log("No refresh token given.")
+    res.status(401).send({message: "No refresh token given."})
   }
   else {
     getTokenFromRefreshToken(refresh_token, function(err, token) {
-      completion(err, token)
+      if (err) {
+        console.log("Token expired and we culdn't refresh it.")
+        res.status(401).send({message: "Token expired. Couldn't refresh."})
+      }
+      else {
+        console.log("Token refreshed.")
+        saveTokenData(req, token)
+        verifyUser(req, res, next)
+      }
     })
   }
 }
 
+// Ensure user is in the authorized user database
+function verifyUser(req, res, next) {
+  var userInfo = req.session.user_info
+  var email =  userInfo ? userInfo.email : req.headers.email
+  db.retrieveUsers(function(err, data) {
+    if (err) {
+      res.status(500).send({message: "Coudln't retrieve user list from database."})
+    }
+    else {
+      console.log(data[0].array)
+      var allowedUsers = data[0].array
+      var allowed = allowedUsers.indexOf(email) >= 0 
+      if (allowed) {
+        next()
+      }
+      else {
+        res.status(403).send({message: "User logged in successfuly but does not have sufficient permission."})
+      }
+    }
+  })
+}
+
+// Get authorization url 
 function getAuthUrl() {
   var returnVal = oauth2.authorizationCode.authorizeURL({
     redirect_uri: redirectUri,
@@ -201,6 +248,7 @@ function getAuthUrl() {
   return returnVal;
 }
 
+// Create token from authorization code
 function getTokenFromCode(authCode, completion) {
   oauth2.authorizationCode.getToken({
     code: authCode,
@@ -218,25 +266,21 @@ function getTokenFromCode(authCode, completion) {
     });
 }
 
-function tokenReceived(req, res, token) {
-  // save tokens in session
+// Save tokens in session
+function saveTokenData(req, token) {
   req.session.access_token = token.token.access_token
   req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token)
 }
 
+
+// Parse token and return user information
 function getInfoFromIDToken(id_token) {
-  // JWT is in three parts, separated by a '.'
   var token_parts = id_token.split('.');
-  // Token content is in the second part, in urlsafe base64
   var encoded_token = new Buffer(token_parts[1].replace('-', '+').replace('_', '/'), 'base64');
-
   var decoded_token = encoded_token.toString();
-
   var jwt = JSON.parse(decoded_token);
-
-  // Info is stored in JSON web token
   var userInfo = {
       name: jwt.name,
       email: jwt.preferred_username,
@@ -244,7 +288,7 @@ function getInfoFromIDToken(id_token) {
   return userInfo
 }
 
-
+// Create a new token from the refresh token 
 function getTokenFromRefreshToken(refresh_token, completion) {
   var token = oauth2.accessToken.create({ refresh_token: refresh_token, expires_in: 0});
   token.refresh(function(err, result) {
