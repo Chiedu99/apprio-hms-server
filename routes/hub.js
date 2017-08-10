@@ -8,8 +8,8 @@
 
 var child = require("child_process")
 var binPath = "/usr/bin/python"
-var daemonPath = "../daemon/sp_daemon.py"
-var piDaemonPath = "../daemon/pi_daemon.py"
+var daemonPath = "../apprio-hms-daemon/sp_daemon.py"
+var piDaemonPath = "../apprio-hms-daemon/pi_daemon.py"
 var db = require('../db.js')
 var pi = require('./pi.js')
 var colors = require('colors')

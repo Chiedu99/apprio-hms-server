@@ -8,7 +8,7 @@
 
 var child = require("child_process")
 var binPath = "/usr/bin/python"
-var piDaemonPath = "../daemon/pi_daemon.py"
+var piDaemonPath = "../apprio-hms-daemon/pi_daemon.py"
 var db = require('../db.js')
 var bodyParser = require('body-parser')
 var colors = require('colors')
