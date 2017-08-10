@@ -85,7 +85,7 @@ module.exports = function(app) {
         }
         else {
           saveTokenData(req, token)
-          verifyUser(req, res, next)
+          verifyUser(req, res, console.log(""))
           console.log(token)
           res.status(200).send({success: true})
         }
