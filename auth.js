@@ -183,7 +183,8 @@ function verifyToken(req, res, kid, id_token, refresh_token, next) {
           }
         }
         else if (decoded.name && decoded.iss && decoded.aud) {
-          verifyUser(req, res, next)
+          next()
+          // verifyUser(req, res, next)
         }
         else {
           res.status(401).send({message: "Couldn't decode token. Token invalid."})
@@ -216,24 +217,23 @@ function refreshToken(req, res, next, refresh_token) {
 
 // Ensure user is in the authorized user database
 function verifyUser(req, res, next) {
-  next()
-  // var userInfo = req.session.user_info
-  // var email =  userInfo ? userInfo.email : req.headers.email
-  // db.retrieveUsers(function(err, data) {
-  //   if (err) {
-  //     res.status(500).send({message: "Coudln't retrieve user list from database."})
-  //   }
-  //   else {
-  //     var allowedUsers = data[0].array
-  //     var allowed = allowedUsers.indexOf(email) >= 0 
-  //     if (allowed) {
-  //       next()
-  //     }
-  //     else {
-  //       res.status(403).send({message: "User logged in successfully but does not have sufficient permission."})
-  //     }
-  //   }
-  // })
+  var userInfo = req.session.user_info
+  var email =  userInfo ? userInfo.email : req.headers.email
+  db.retrieveUsers(function(err, data) {
+    if (err) {
+      res.status(500).send({message: "Coudln't retrieve user list from database."})
+    }
+    else {
+      var allowedUsers = data[0].array
+      var allowed = allowedUsers.indexOf(email) >= 0 
+      if (allowed) {
+        next()
+      }
+      else {
+        res.status(403).send({message: "User logged in successfully but does not have sufficient permission."})
+      }
+    }
+  })
 }
 
 // Get authorization url 
