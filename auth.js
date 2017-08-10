@@ -86,8 +86,6 @@ module.exports = function(app) {
         else {
           saveTokenData(req, token)
           verifyUser(req, res, console.log(""))
-          console.log(token)
-          res.status(200).send({success: true})
         }
       })
     }
@@ -232,11 +230,13 @@ function verifyUser(req, res, next) {
         next()
       }
       else {
-        res.status(403).send({message: "User logged in successfuly but does not have sufficient permission."})
+        res.status(403).send({message: "User logged in successfully but does not have sufficient permission."})
       }
     }
   })
 }
+
+function verifyUserWithDatabse()
 
 // Get authorization url 
 function getAuthUrl() {
