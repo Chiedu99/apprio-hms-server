@@ -236,8 +236,6 @@ function verifyUser(req, res, next) {
   })
 }
 
-function verifyUserWithDatabse()
-
 // Get authorization url 
 function getAuthUrl() {
   var returnVal = oauth2.authorizationCode.authorizeURL({
