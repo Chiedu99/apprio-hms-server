@@ -216,6 +216,7 @@ function refreshToken(req, res, next, refresh_token) {
 
 // Ensure user is in the authorized user database
 function verifyUser(req, res, next) {
+  next()
   var userInfo = req.session.user_info
   var email =  userInfo ? userInfo.email : req.headers.email
   db.retrieveUsers(function(err, data) {
@@ -223,7 +224,6 @@ function verifyUser(req, res, next) {
       res.status(500).send({message: "Coudln't retrieve user list from database."})
     }
     else {
-      console.log(data[0].array)
       var allowedUsers = data[0].array
       var allowed = allowedUsers.indexOf(email) >= 0 
       if (allowed) {
