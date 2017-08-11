@@ -144,7 +144,7 @@ module.exports = function(app) {
     }
     else {
       // decode id_token the verify it
-      console.log(id_token)
+      console.log(req.session)
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
       verifyToken(req, res, kid, id_token, refresh_token, next)
