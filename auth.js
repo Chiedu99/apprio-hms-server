@@ -136,6 +136,7 @@ module.exports = function(app) {
   // Authenticate user before completing route
   function authenticate(req, res, next) {
     console.log("Authenticating...")
+    console.log(req.headers)
     var id_token = req.session.id_token || req.headers.id_token
     var refresh_token = req.session.refresh_token || req.headers.refresh_token
     if (id_token === undefined || refresh_token === undefined) {
@@ -144,7 +145,6 @@ module.exports = function(app) {
     }
     else {
       // decode id_token the verify it
-      console.log(req.session)
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
       verifyToken(req, res, kid, id_token, refresh_token, next)
