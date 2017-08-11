@@ -300,16 +300,22 @@ var changePowerState = function(req, res) {
 	var args =  [daemonPath, cmd]
 	// Run daemon to query power state.
 	runDaemon(args, function(err, response, stderr) {
+		console.log(response)
 		if (err === null) {
 			if (response.includes("error")) {
 				res.status(500).send()
 				console.log("Serial error.")
+				return
 			}
 			else {
 				var cmd
 				var state
-				switch (response) {
-					case "0", "1", "2", "3", "4":
+				switch (response[0]) {
+					case "0":
+					case "1":
+					case "2":
+					case "3":
+					case "4":
 						cmd = "PowerOn"
 						state = "5"
 						break
@@ -320,8 +326,8 @@ var changePowerState = function(req, res) {
 					default:
 						res.status(500).send()
 						console.log("Serial error.")
+						return 
 				}
-				console.log(cmd)
 				args = [daemonPath, cmd]
 				// Run daemon with power on or off command.
 				runDaemon(args, function(err, response, stderr) {
