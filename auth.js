@@ -84,7 +84,7 @@ module.exports = function(app) {
           res.status(401).send({message: err})
         }
         else {
-          saveTokenData(req, token)
+          saveTokenData(req, res, token)
           verifyUser(req, res, console.log(""))
         }
       })
@@ -107,7 +107,7 @@ module.exports = function(app) {
           res.status(401).send({message: err})
         }
         else {
-          saveTokenData(req, token)
+          saveTokenData(req,res, token)
           var data = {
             access_token: req.session.access_token,
             refresh_token: req.session.refresh_token,
@@ -209,7 +209,7 @@ function refreshToken(req, res, next, refresh_token) {
       }
       else {
         console.log("Token refreshed.")
-        saveTokenData(req, token)
+        saveTokenData(req, res, token)
         verifyUser(req, res, next)
       }
     })
@@ -266,11 +266,14 @@ function getTokenFromCode(authCode, completion) {
 }
 
 // Save tokens in session
-function saveTokenData(req, token) {
+function saveTokenData(req, res,  token) {
   req.session.access_token = token.token.access_token
   req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token)
+  res.set("access_token", token.token.access_token)
+  res.set("refresh_token", token.token.refresh_token)
+  res.set("id_token", token.token.id_token)
 }
 
 
