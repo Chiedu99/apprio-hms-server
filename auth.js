@@ -136,10 +136,10 @@ module.exports = function(app) {
   // Authenticate user before completing route
   function authenticate(req, res, next) {
     console.log("Authenticating...")
-    console.log(req.headers)
     var id_token = req.session.id_token || req.headers.id_token
     var refresh_token = req.session.refresh_token || req.headers.refresh_token
-    if (id_token === undefined || refresh_token === undefined) {
+    var access_token = req.session.access_token || req.headers.access_token
+    if (id_token === undefined || refresh_token === undefined || access_token === undefined) {
       console.log("No tokens given.")
       res.status(401).send({message: "No token given."})
     }
@@ -147,7 +147,7 @@ module.exports = function(app) {
       // decode id_token the verify it
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
-      verifyToken(req, res, kid, id_token, refresh_token, next)
+      verifyToken(req, res, kid, access_token,id_token, refresh_token, next)
     }
   }
 
@@ -158,7 +158,7 @@ module.exports = function(app) {
 ////////////////////////////////////////////////////////////////
 
 // Verify id_token and refresh it if it's expired
-function verifyToken(req, res, kid, id_token, refresh_token, next) {
+function verifyToken(req, res, kid, access_token, id_token, refresh_token, next) {
   var clientOpts = {
       strictSsl: true, 
       jwksUri: process.env.PUBLIC_KEY_URL || config.publicKeyURL
@@ -185,6 +185,9 @@ function verifyToken(req, res, kid, id_token, refresh_token, next) {
         }
         else if (decoded.name && decoded.iss && decoded.aud) {
           console.log("Authenticated!")
+          res.set("access_token", access_token)
+          res.set("refresh_token", refresh_token)
+          res.set("id_token", id_token)
           next()
         }
         else {
@@ -271,11 +274,14 @@ function saveTokenData(req, res,  token) {
   req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token)
+  setTokenHeaders()
+}
+
+function setTokenHeaders() {
   res.set("access_token", token.token.access_token)
   res.set("refresh_token", token.token.refresh_token)
   res.set("id_token", token.token.id_token)
 }
-
 
 // Parse token and return user information
 function getInfoFromIDToken(id_token) {
