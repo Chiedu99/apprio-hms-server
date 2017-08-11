@@ -107,14 +107,13 @@ module.exports = function(app) {
           res.status(401).send({message: err})
         }
         else {
-          saveTokenData(req,res, token)
+          saveTokenData(req, res, token)
           var data = {
             access_token: req.session.access_token,
             refresh_token: req.session.refresh_token,
             id_token: req.session.id_token,
             user_info: req.session.user_info
           }
-          console.log(data)
           res.status(200).send(data)
         }
       })
@@ -278,7 +277,7 @@ function saveTokenData(req, res,  token) {
   setTokenHeaders()
 }
 
-function setTokenHeaders() {
+function setTokenHeaders(res) {
   res.set("access_token", token.token.access_token)
   res.set("refresh_token", token.token.refresh_token)
   res.set("id_token", token.token.id_token)
