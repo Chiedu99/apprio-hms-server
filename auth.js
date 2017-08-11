@@ -144,6 +144,7 @@ module.exports = function(app) {
     }
     else {
       // decode id_token the verify it
+      console.log(id_token)
       var decoded = jwt.decode(id_token, {complete: true})
       var kid = decoded.header.kid
       verifyToken(req, res, kid, id_token, refresh_token, next)
@@ -183,8 +184,8 @@ function verifyToken(req, res, kid, id_token, refresh_token, next) {
           }
         }
         else if (decoded.name && decoded.iss && decoded.aud) {
+          console.log("Authenticated!")
           next()
-          // verifyUser(req, res, next)
         }
         else {
           res.status(401).send({message: "Couldn't decode token. Token invalid."})
