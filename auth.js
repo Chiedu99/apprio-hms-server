@@ -274,7 +274,7 @@ function saveTokenData(req, res,  token) {
   req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token)
-  setTokenHeaders()
+  setTokenHeaders(res)
 }
 
 function setTokenHeaders(res) {
