@@ -85,10 +85,17 @@ module.exports = function(app) {
         }
         else {
           saveTokenData(req, res, token)
-          verifyUser(req, res, console.log(""))
+          verifyUser(req, res, function() {
+            res.status(201).send({message: "success"})
+          })
         }
       })
     }
+    // else if (req.headers.id_token) { 
+    //   var id_token = req.headers.id_token
+
+
+    // }
     else {
       var url = getAuthUrl()
       console.log(url)
@@ -180,7 +187,7 @@ function verifyToken(req, res, kid, access_token, id_token, refresh_token, next)
             refreshToken(req, res, next, refresh_token) 
           }
           else {
-            res.status(401).send({message: "Token invalid."})
+            res.status(401).send({message: err})
           }
         }
         else if (decoded.name && decoded.iss && decoded.aud) {
@@ -208,7 +215,7 @@ function refreshToken(req, res, next, refresh_token) {
     getTokenFromRefreshToken(refresh_token, function(err, token) {
       if (err) {
         console.log("Token expired and we culdn't refresh it.")
-        res.status(401).send({message: "Token expired. Couldn't refresh."})
+        res.status(401).send({message: err})
       }
       else {
         console.log("Token refreshed.")
@@ -225,7 +232,8 @@ function verifyUser(req, res, next) {
   var email =  userInfo ? userInfo.email : req.headers.email
   db.retrieveUsers(function(err, data) {
     if (err) {
-      res.status(500).send({message: "Coudln't retrieve user list from database."})
+      console.log(err)
+      res.status(500).send({message: err})
     }
     else {
       var allowedUsers = data[0].array
@@ -247,6 +255,7 @@ function getAuthUrl() {
     scope: scopes.join(' '),
     state:"123"
   });
+  console.log(returnVal)
   return returnVal;
 }
 
