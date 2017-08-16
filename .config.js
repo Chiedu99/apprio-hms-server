@@ -1,8 +1,8 @@
 module.exports = {
 	secret: "YHS5vyJKEwjgauZLukpuc2Tx7Wfmdh",
 	clientID: '81b8b800-31ad-480b-9dcf-bc93a7debf08',
-	clientSecret: 'rLP286CJ9J6dxDkFBQNagF7',
-	redirectUri: "https://apprio-pi-server-heroku.herokuapp.com/authorize",
+	clientSecret: '7oFpjrhSUwqtsMzYJ9gB8Y7',
+	redirectUri: "http://localhost:8000/authorize",
 	tokenHost: "https://login.microsoftonline.com",
 	authorizePath: '/common/oauth2/v2.0/authorize',
 	tokenPath: '/common/oauth2/v2.0/token',
