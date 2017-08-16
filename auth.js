@@ -115,29 +115,20 @@ module.exports = function(app) {
   // Extract user data from the token
   app.get('/getTokenData', function(req, res) {
     console.log('/getTokenData'.blue)
-    var authCode = req.query.code
-    if (authCode) {
-      getTokenFromCode(authCode, function(err, token) {
-        if (err) {
-          console.log(err)
-          res.status(401).send({message: err})
-        }
-        else {
-          saveTokenData(req, res, token)
-          var data = {
-            access_token: req.session.access_token,
-            refresh_token: req.session.refresh_token,
-            id_token: req.session.id_token,
-            user_info: req.session.user_info
-          }
-          res.status(200).send(data)
-        }
-      })
-    } 
-    else {
-      console.log("No auth code given.")
-      res.status(400).send({message: "No auth code given."})
+    var access_token = req.session.access_token
+    var id_token = req.session.id_token
+    if (access_token == undefined || id_token == undefined) {
+      console.log("Attemtped to access /getTokenData without permissions. Redirecting to /.")
+      res.redirect('/')
+      return
     }
+    var data = {
+      access_token: req.session.access_token,
+      refresh_token: req.session.refresh_token,
+      id_token: req.session.id_token,
+      user_info: req.session.user_info
+    }
+    res.status(200).send(data)
   })
 
   // Log a user out of the session
