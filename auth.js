@@ -107,6 +107,7 @@ module.exports = function(app) {
     }
     else {
       console.log('Login success.')
+      res.status(201)
     }
   })
 
