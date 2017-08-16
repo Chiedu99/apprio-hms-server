@@ -99,6 +99,7 @@ module.exports = function(app) {
   })
 
   app.get('/loginComplete', function(req, res) {
+    console.log('/loginComplete'.blue)
     var access_token = req.session.access_token
     var id_token = req.session.id_token
     if (access_token == undefined || id_token == undefined) {
@@ -107,7 +108,7 @@ module.exports = function(app) {
     }
     else {
       console.log('Login success.')
-      res.status(201)
+      res.status(201).send()
     }
   })
 
