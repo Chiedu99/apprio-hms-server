@@ -86,7 +86,7 @@ module.exports = function(app) {
         else {
           saveTokenData(req, res, token)
           verifyUser(req, res, function() {
-            res.redirect('/loginComplete')
+            res.redirect('/loginComplete?code=' + authCode)
           })
         }
       })
