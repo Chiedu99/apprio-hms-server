@@ -4,8 +4,8 @@ module.exports = {
 	clientSecret: '7oFpjrhSUwqtsMzYJ9gB8Y7',
 	redirectUri: "http://localhost:8000/authorize",
 	tokenHost: "https://login.microsoftonline.com",
-	authorizePath: '/common/oauth2/v2.0/authorize',
-	tokenPath: '/common/oauth2/v2.0/token',
+	authorizePath: '/common/oauth2/authorize',
+	tokenPath: '/common/oauth2/token',
 	port: 8000,
 	dbURL: 'postgres://mxtnxulynacpcj:f341e82d34b37bd59dc6b92ce133863eafa9caa80c5eccfbe06cedde1b1a59f0@ec2-54-235-168-152.compute-1.amazonaws.com:5432/d6kcqlbbrac5bn?ssl=true',
 	cn: {
