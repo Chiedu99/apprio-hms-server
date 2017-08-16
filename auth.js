@@ -144,6 +144,7 @@ module.exports = function(app) {
     var id_token = req.session.id_token || req.headers.id_token
     var refresh_token = req.session.refresh_token || req.headers.refresh_token
     var access_token = req.session.access_token || req.headers.access_token
+    console.log(id_token)
     if (id_token === undefined || access_token === undefined) {
       console.log("No tokens given.")
       res.status(401).send({message: "No token given."})
