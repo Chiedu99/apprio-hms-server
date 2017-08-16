@@ -91,11 +91,6 @@ module.exports = function(app) {
         }
       })
     }
-    // else if (req.headers.id_token) { 
-    //   var id_token = req.headers.id_token
-
-
-    // }
     else {
       var url = getAuthUrl()
       console.log(url)
@@ -106,8 +101,7 @@ module.exports = function(app) {
   app.get('/loginComplete', function(req, res) {
     var access_token = req.session.access_token
     var id_token = req.session.id_token
-    var refresh_token = req.session.refresh_token
-    if (access_token == undefined || id_token == undefined || refresh_token == undefined) {
+    if (access_token == undefined || id_token == undefined) {
       console.log("Attemtped to access /loginComplete without permissions. Redirecting to /.")
       res.redirect('/')
     }
@@ -159,7 +153,7 @@ module.exports = function(app) {
     var refresh_token = req.session.refresh_token || req.headers.refresh_token
     var access_token = req.session.access_token || req.headers.access_token
     console.log(req.headers)
-    if (id_token === undefined || refresh_token === undefined || access_token === undefined) {
+    if (id_token === undefined || access_token === undefined) {
       console.log("No tokens given.")
       res.status(401).send({message: "No token given."})
     }
