@@ -86,7 +86,7 @@ module.exports = function(app) {
         else {
           saveTokenData(req, res, token)
           verifyUser(req, res, function() {
-            res.status(201).send({message: "success"})
+            res.redirect('/loginComplete')
           })
         }
       })
@@ -100,6 +100,19 @@ module.exports = function(app) {
       var url = getAuthUrl()
       console.log(url)
       res.send({url: url})
+    }
+  })
+
+  app.get('/loginComplete', function(req, res) {
+    var access_token = req.session.access_token
+    var id_token = req.session.id_token
+    var refresh_token = req.session.refresh_token
+    if (access_token == undefined || id_token == undefined || refresh_token == undefined) {
+      console.log("Attemtped to access /loginComplete without permissions. Redirecting to /.")
+      res.redirect('/')
+    }
+    else {
+      console.log('Login success.')
     }
   })
 
