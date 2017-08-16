@@ -107,7 +107,6 @@ module.exports = function(app) {
     var access_token = req.session.access_token
     var id_token = req.session.id_token
     var refresh_token = req.session.refresh_token
-    console.log(req.session)
     if (access_token == undefined || id_token == undefined || refresh_token == undefined) {
       console.log("Attemtped to access /loginComplete without permissions. Redirecting to /.")
       res.redirect('/')
@@ -297,6 +296,7 @@ function saveTokenData(req, res,  token) {
   req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token)
+  console.log(token.token)
   setTokenHeaders(res, token)
 }
 
