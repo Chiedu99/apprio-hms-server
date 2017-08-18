@@ -1,9 +1,9 @@
 # Apprio HMS
-* Mecca Parker
-* 2017 Summer Internship Project
-* App: https://github.com/meccaparker/apprio-hms.git
-* Server: https://github.com/meccaparker/apprio-hms-server.git
-* Daemon: https://github.com/meccaparker/apprio-daemon.git
+Mecca Parker\n
+2017 Summer Internship Project
+App: https://github.com/meccaparker/apprio-hms.git
+Server: https://github.com/meccaparker/apprio-hms-server.git
+Daemon: https://github.com/meccaparker/apprio-daemon.git
 
 The Apprio HMS project is a project that interfaces the Raspberry Pi 3 with the Microsoft Surface Hub. Its objective is to provide a way to manage and control a system of Microsoft Hubs all wrapped up within a hybrid mobile app. Written using the [Ionic framework](https://ionicframework.com/), the app  connects the user to the Hubs through dedicated Raspberry Pi servers interfacing via serial connection with the Hubs. This allows the Hubs to be accessed remotely from the application from anywhere. In addition to this, the app and Raspberry Pi's store and receive information about the Hubs within a PostgresQL database. 
 
