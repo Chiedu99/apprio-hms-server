@@ -82,19 +82,18 @@ module.exports = function(app) {
         if (err) {
           console.log(err)
           res.status(401).send({message: err})
+          return
         }
-        else {
-          saveTokenData(req, res, token)
-          verifyUser(req, res, function() {
-            res.redirect('/loginComplete?code=' + authCode)
-          })
-        }
+        saveTokenData(req, res, token)
+        verifyUser(req, res, function() {
+          res.redirect('/loginComplete?code=' + authCode)
+          return
+        })
       })
     }
-    else {
-      var url = getAuthUrl()
-      res.send({url: url})
-    }
+    var url = getAuthUrl()
+    res.send({url: url})
+    
   })
 
   app.get('/loginComplete', function(req, res) {
@@ -105,11 +104,10 @@ module.exports = function(app) {
     if (access_token == undefined || id_token == undefined) {
       console.log("Attemtped to access /loginComplete without permissions. Redirecting to /.")
       res.redirect('/')
+      return
     }
-    else {
-      console.log('Login success.')
-      res.status(201).send()
-    }
+    console.log('Login success.')
+    res.status(201).send()
   })
 
   // Extract user data from the token
@@ -145,17 +143,15 @@ module.exports = function(app) {
     var id_token = req.session.id_token || req.headers.id_token
     var refresh_token = req.session.refresh_token || req.headers.refresh_token
     var access_token = req.session.access_token || req.headers.access_token
-    console.log(id_token)
     if (id_token === undefined || access_token === undefined) {
       console.log("No tokens given.")
       res.status(401).send({message: "No token given."})
+      return
     }
-    else {
-      // decode id_token the verify it
-      var decoded = jwt.decode(id_token, {complete: true})
-      var kid = decoded.header.kid
-      verifyToken(req, res, kid, access_token,id_token, refresh_token, next)
-    }
+    // decode id_token the verify it
+    var decoded = jwt.decode(id_token, {complete: true})
+    var kid = decoded.header.kid
+    verifyToken(req, res, kid, access_token,id_token, refresh_token, next)
   }
 
 }
@@ -234,28 +230,26 @@ function verifyUser(req, res, next) {
     if (err) {
       console.log(err)
       res.status(500).send({message: err})
+      return
     }
-    else {
-      var allowedUsers = data[0].array
-      var allowed = allowedUsers.indexOf(email) >= 0 
-      if (allowed) {
-        next()
-      }
-      else {
-        res.status(403).send({message: "User logged in successfully but does not have sufficient permission."})
-      }
+    var allowedUsers = data[0].array
+    var allowed = allowedUsers.indexOf(email) >= 0 
+    if (allowed) {
+      next()
+      return
     }
+    res.status(403).send({message: "User logged in successfully but does not have sufficient permission."})
   })
 }
 
 // Get authorization url 
 function getAuthUrl() {
-  var returnVal = oauth2.authorizationCode.authorizeURL({
+  var authURL = oauth2.authorizationCode.authorizeURL({
     redirect_uri: redirectUri,
     scope: scopes.join(' '),
     state:"123"
   });
-  return returnVal;
+  return authURL;
 }
 
 // Create token from authorization code
@@ -310,9 +304,8 @@ function getTokenFromRefreshToken(refresh_token, completion) {
   token.refresh(function(err, result) {
     if (err) {
       completion(err, null)
+      return 
     }
-    else {
-      completion(null, result)
-    }
+    completion(null, result)
   })
 }
