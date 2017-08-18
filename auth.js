@@ -187,7 +187,7 @@ function verifyToken(req, res, kid, access_token, id_token, refresh_token, next)
           }
         }
         else if (decoded.name && decoded.iss && decoded.aud) {
-          console.log("Authenticated!")
+          console.log("Authenticated.")
           res.set("access_token", access_token)
           res.set("refresh_token", refresh_token)
           res.set("id_token", id_token)
