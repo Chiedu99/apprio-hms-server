@@ -28,9 +28,7 @@ The Apprio HMS server is a server that runs on the Raspberry Pi that handles all
 		
 1. We'd like to run the **sp_daemon.py** script every five minutes and write the output to the **daemon.log** file. To do this, set up a cronjob to run every five minutes by opening the crontab file editor `crontab -e`  and changing the last line to:
 		
-`bash
-* /5 * * * * cd apprio-hms-daemon daemon && python ./sp_daemon.py >> daemon.log 2>&1
-`
+`bash * /5 * * * * cd apprio-hms-daemon daemon && python ./sp_daemon.py >> daemon.log 2>&1`
 
 1. Finally, run the server initialization script **init_server.sh** at startup. Open an editor for the **rc.local** script with `sudo nano /etc/rc.local` and append the following to the end of the file: 
 		
