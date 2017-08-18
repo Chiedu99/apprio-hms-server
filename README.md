@@ -18,28 +18,24 @@ Th
 
 1. Download 'apprio-hms-daemon' and 'apprio-hms-server' directories into the 'pi' directory. 
 
-1. Install server dependencies. Change to the 'apprio-hms-server' directory and execute:
+1. Change to the 'apprio-hms-server' directory and install npm dependencies execute `npm install`.
 		
-'''bash
-npm install
-'''
-
-1. Setup a cronjob to run daemon every 5 minutes: 
-	1. Execute 'crontab -e'
-	1. Change last line to:
+1. Setup a cronjob to run daemon every 5 minutes. Open the crontab file editor `crontab -e` and change the last line to:
 		
-'''bash
+```bash
 * /5 * * * * cd apprio-hms-daemon daemon && python ./sp_daemon.py >> daemon.log 2>&1
-'''
+```
 
-1. Setup server to initialize at startup:
-	1. Run 
+1. Next set up the server to initialize at startup. Open an editor for the rc.local script 
 
-	'sudo nano /etc/rc.local'
-	1. Add the following to the end of the file: 
+```bash 
+sudo nano /etc/rc.local
+```
+And add the fgollowing to the end of the file: 
 		
-'''bash
+```bash
 bash /home/pi/apprio-hms-server/init_server.sh &
 
 exit 0
-'''
+```
+
