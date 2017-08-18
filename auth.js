@@ -84,23 +84,21 @@ module.exports = function(app) {
           res.status(401).send({message: err})
           return
         }
-        saveTokenData(req, res, token)
-        verifyUser(req, res, function() {
+        saveTokenData(req, res, token, verifyUser, function() {
           res.redirect('/loginComplete?code=' + authCode)
           return
         })
       })
+      return
     }
     var url = getAuthUrl()
     res.send({url: url})
-    
   })
 
   app.get('/loginComplete', function(req, res) {
     console.log('/loginComplete'.blue)
     var access_token = req.session.access_token
     var id_token = req.session.id_token
-    console.log(req.session)
     if (access_token == undefined || id_token == undefined) {
       console.log("Attemtped to access /loginComplete without permissions. Redirecting to /.")
       res.redirect('/')
@@ -215,8 +213,7 @@ function refreshToken(req, res, next, refresh_token) {
       }
       else {
         console.log("Token refreshed.")
-        saveTokenData(req, res, token)
-        verifyUser(req, res, next)
+        saveTokenData(req, res, token, verifyUser, next)
       }
     })
   }
@@ -226,6 +223,7 @@ function refreshToken(req, res, next, refresh_token) {
 function verifyUser(req, res, next) {
   var userInfo = req.session.user_info
   var email =  userInfo ? userInfo.email : req.headers.email
+  console.log('verifying user')
   db.retrieveUsers(function(err, data) {
     if (err) {
       console.log(err)
@@ -271,18 +269,21 @@ function getTokenFromCode(authCode, completion) {
 }
 
 // Save tokens in session
-function saveTokenData(req, res,  token) {
+function saveTokenData(req, res,  token, verifyUser, completion) {
+  console.log('saving token data')
   req.session.access_token = token.token.access_token
   req.session.refresh_token = token.token.refresh_token
   req.session.id_token = token.token.id_token
   req.session.user_info = getInfoFromIDToken(token.token.id_token)
-  setTokenHeaders(res, token)
+  setTokenHeaders(req, res, token, verifyUser, completion)
 }
 
-function setTokenHeaders(res, token) {
+function setTokenHeaders(req, res, token, verifyUser, completion) {
+  console.log('setting headers')
   res.set("access_token", token.token.access_token)
   res.set("refresh_token", token.token.refresh_token)
   res.set("id_token", token.token.id_token)
+  verifyUser(req, res, completion)
 }
 
 // Parse token and return user information
