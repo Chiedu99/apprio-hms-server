@@ -15,5 +15,5 @@ module.exports = {
 		user: 'mxtnxulynacpcj',
 		password: 'f341e82d34b37bd59dc6b92ce133863eafa9caa80c5eccfbe06cedde1b1a59f0'
 	},
-	publicKeyURL: "http://login.microsoftonline.com/common/discovery/keys"
+	publicKeyURL: "https://login.microsoftonline.com/common/discovery/v2.0/keys"
 }
