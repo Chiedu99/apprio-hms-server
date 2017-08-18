@@ -30,7 +30,8 @@ The Apprio HMS server is a server that runs on the Raspberry Pi that handles all
 		
 ```bash
 * /5 * * * * cd apprio-hms-daemon daemon && python ./sp_daemon.py >> daemon.log 2>&1
-``` This runs the sp_daemon.py script every five minutes and writes the output to the daemon.log file.
+``` 
+This runs the sp_daemon.py script every five minutes and writes the output to the daemon.log file.
 
 1. Next, set up the server to initialize at startup. Open an editor for the rc.local script with `sudo nano /etc/rc.local` and append the following to the end of the file: 
 		
@@ -38,5 +39,6 @@ The Apprio HMS server is a server that runs on the Raspberry Pi that handles all
 bash /home/pi/apprio-hms-server/init_server.sh &
 
 exit 0
-``` This runs the server initialization script upon startup of the Raspberry Pi device.
+``` 
+This runs the server initialization script upon startup of the Raspberry Pi device.
 
